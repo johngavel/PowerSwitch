@@ -1,7 +1,7 @@
 #ifndef __GAVEL_POWERSWITCH
 #define __GAVEL_POWERSWITCH
 
-#include <util.h>
+#include <architecture.h>
 
 class PowerSwitch : public Task {
 public:

@@ -7,7 +7,7 @@
 
 #define SCREEN_TAB "   "
 
-void PowerDisplay::loop() {
+void PowerDisplay::screen() {
   int lineIndex = 0;
   String displayLines[8];
   String buildString;

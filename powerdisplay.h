@@ -4,7 +4,7 @@
 #include <screen.h>
 
 class PowerDisplay : public RefreshScreen {
-  void loop();
+  void screen();
 };
 
 #endif

@@ -4,7 +4,18 @@
 #include "powerserver.h"
 #include "powerswitch.h"
 
-#include <GavelArch.h>
+#include <architecture.h>
+#include <eeprom.h>
+#include <ethernetmodule.h>
+#include <files.h>
+#include <gpio.h>
+#include <onboardled.h>
+#include <scan.h>
+#include <serialport.h>
+#include <servermodule.h>
+#include <startup.h>
+#include <temperature.h>
+#include <watchdog.h>
 
 #define DHT_11_PIN 28
 #define TCA_ADDRESS 0x27
