@@ -28,7 +28,7 @@ const char* ProgramInfo::compileTime = __TIME__;
 const HW_TYPES ProgramInfo::hw_type = HW_RASPBERRYPI_PICO;
 const unsigned char ProgramInfo::ProgramNumber = 0x01;
 const unsigned char ProgramInfo::MajorVersion = 0x01;
-const unsigned char ProgramInfo::MinorVersion = 0x10;
+const unsigned char ProgramInfo::MinorVersion = 0x11;
 
 PowerSwitch powerSwitch;
 PowerMemory powerMemory;
@@ -75,17 +75,17 @@ void loop() {
   BLINK->loop();
   ETHERNET->loop();
   SERVER->loop();
+  PORT->loop();
+  TEMPERATURE->loop();
+  EEPROM->loop();
+  powerSwitch.loop();
   WATCHDOG->loop();
   delay(1);
 }
 
 void loop1() {
-  powerSwitch.loop();
-  PORT->loop();
   SCREEN->loop();
   GPIO->loop();
-  EEPROM->loop();
-  TEMPERATURE->loop();
   WATCHDOG->loop();
   delay(1);
 }

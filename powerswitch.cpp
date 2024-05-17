@@ -11,7 +11,7 @@
 static void minimalist();
 void testOutput();
 
-void PowerSwitch::setup() {
+void PowerSwitch::setupTask() {
   PORT->addCmd("min", "", "Help for the minimalist http requests", minimalist);
   PORT->addCmd("test", "", "Tests all of the Relay Commands and Status GPIO", testOutput);
 

@@ -5,7 +5,8 @@
 
 class PowerSwitch : public Task {
 public:
-  void setup();
+  PowerSwitch() : Task("PowerSwitch"){};
+  void setupTask();
   void executeTask();
 
 private:
