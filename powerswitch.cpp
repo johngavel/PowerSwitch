@@ -54,8 +54,7 @@ void PowerSwitch::monitorSwitch() {
   for (int i = 1; i <= NUM_DEVICES; i++) {
     bool currentStatus = GPIO->getPin(GPIO_INPUT, i)->getCurrentStatus();
     if (currentStatus != POWER_DATA->getCurrentRelayStatus(i - 1)) {
-      if (firstPass == false)
-        SCREEN->setScreen(LIGHT, String(POWER_DATA->getDeviceName(i - 1)) + String((currentStatus) ? " ON" : " OFF"));
+      if (firstPass == false) SCREEN->setScreen(LIGHT, String(POWER_DATA->getDeviceName(i - 1)) + String((currentStatus) ? " ON" : " OFF"));
 
       POWER_DATA->setCurrentRelayStatus(i - 1, currentStatus);
       GPIO->getPin(GPIO_LED, i)->setCurrentStatus(currentStatus);

@@ -2,139 +2,78 @@
 
 #include "powermemory.h"
 
+#include <commonhtml.h>
 #include <gpio.h>
 #include <serialport.h>
 #include <servermodule.h>
+#include <stringutils.h>
 #include <temperature.h>
 #include <watchdog.h>
 
-static void sendPageBegin(HTMLBuilder* html, bool autoRefresh = false, int seconds = 10) {
-  // HTTP headers always start with a response code (e.g. HTTP/1.1 200 OK)
-  // and a content-type so the client knows what's coming, then a blank line:
-  html->println("HTTP/1.1 200 OK");
-  html->println("Content-type:text/html");
-  html->println("Connection: close");
-  html->println();
+static ErrorPage errorPage;
+static CodePage codePage;
+static UploadPage uploadPage;
+static UpgradePage upgradePage;
+static RebootPage rebootPage;
+static UpgradeProcessingFilePage upgradeProcessingFilePage;
+static UploadProcessingFilePage uploadProcessingFilePage;
 
-  // Display the HTML web page
-  html->println("<!DOCTYPE html><html>");
-  html->print("<head>");
-  if (autoRefresh) {
-    html->print("<meta http-equiv=\"refresh\" content=\"");
-    html->print(seconds);
-    html->print("; url=http://");
-    html->print(ETHERNET->getIPAddress().toString());
-    html->println("/\"; name=\"viewport\" content=\"width=device-width, "
-                  "initial-scale=1\" >");
-  }
-  // CSS to style the on/off buttons
-  html->println("<style>html { font-family: courier; font-size: 24px; display: "
-                "inline-block; margin: 0px auto; text-align: center;}");
-  html->println(".button { background-color: red; border: none; color: white; "
-                "padding: 16px 40px;");
-  html->println("text-decoration: none; font-size: 30px; margin: 2px; cursor: pointer;}");
-  html->println(".button2 {background-color: black;}");
-  html->println(".button3 {background-color: grey;}");
-  html->println(".button4 {background-color: green;}");
-  html->println(".center {margin-left: auto; margin-right: auto;}");
-  html->println("footer {");
-  html->println("text-align: center;font-size: 16px;");
-  html->println("padding: 3px;");
-  html->println("background-color: MediumSeaGreen;");
-  html->println("color: white;");
-  html->println("}</style>");
-  html->print("<title>");
-  html->print(ProgramInfo::AppName);
-  html->println("</title></head>");
-  html->print("<body><h1>");
-  html->print(ProgramInfo::AppName);
-  html->println("</h1>");
-}
-
-static void sendPageEnd(HTMLBuilder* html) {
-  String versionString = "Ver. " + String(ProgramInfo::ProgramNumber) + String(".") +
-                         String(ProgramInfo::MajorVersion) + String(".") + String(ProgramInfo::MinorVersion);
-
-  html->println("<footer><p>");
-  html->println(ProgramInfo::AppName);
-  html->println("<br>" + versionString);
-  html->println("<br>Build Date: " + String(ProgramInfo::compileDate) + " Time: " + String(ProgramInfo::compileTime));
-  html->println("<br>Author: John J. Gavel<br>");
-  html->println("</p></footer>");
-  html->println("</body></html>");
-  html->println();
-}
-
-class TemplatePage : public BasicPage {
+class FrontPage : public BasicPage {
 public:
-  TemplatePage() { setPageName("template"); };
-  HTMLBuilder* getHtml(HTMLBuilder* html) {
-    sendPageBegin(html);
-    html->println("<h2>Template<h2/>");
-    sendPageEnd(html);
-    return html;
-  }
-} templatePage;
-
-class ErrorPage : public BasicPage {
-public:
-  ErrorPage() { setPageName("error"); };
-  HTMLBuilder* getHtml(HTMLBuilder* html) {
-    sendPageBegin(html, true, 5);
-    html->println("<section>");
-    html->println("  <div class=\"container\">");
-    html->println("   <div><img class=\"image\" src=\"/errorimg.jpg\" alt=\"\"></div>");
-    html->println("  </div>");
-    html->println("  </div>");
-    html->println("</section>");
-    sendPageEnd(html);
-    return html;
-  }
-} errorPage;
-
-class RootPage : public BasicPage {
-public:
+  FrontPage() {
+    setPageName("index");
+    refresh = 10;
+  };
   virtual void conductAction() = 0;
   HTMLBuilder* getHtml(HTMLBuilder* html) {
     conductAction();
     sendPageBegin(html, true, refresh);
     if (TEMPERATURE->validTemperature()) {
-      html->print("<p>Temperature ");
+      html->brTag();
+      html->print("Temperature ");
       html->print(TEMPERATURE->getTemperature());
-      html->println(" F</p>");
+      html->println(" F");
+      html->brTag();
     }
 
-    html->print("<table class=\"center\">");
+    html->openTag("table", "class=\"center\"");
     for (byte i = 0; i < NUM_DEVICES; i++) {
-      html->print("<tr><td><p>Power ");
+      html->openTrTag()->openTdTag();
+      html->print("Power ");
       html->print(i + 1);
-      html->print(". </td><td>");
-      html->print(POWER_DATA->getDeviceName(i));
-      html->print("</td></p></td><td><a href=\"/");
-      html->print(i + 1);
+      html->print(". ");
+      html->closeTag();
+      html->openTdTag()->print(POWER_DATA->getDeviceName(i));
+      html->closeTag();
+      html->openTdTag();
       if (POWER_DATA->getCurrentRelayStatus(i) == HIGH) {
-        html->println("/off\"><button class=\"button\">ON</button></a></td></tr></p>");
+        String off = "href=\"/" + String(i + 1) + "/off\"";
+        html->openTag("a", off);
+        html->openTag("button", "class=\"button\"");
+        html->print("ON")->closeTag()->closeTag();
       } else {
-        html->println("/on\"><button class=\"button2 "
-                      "button\">OFF</button></a></td></tr>");
+        String on = "href=\"/" + String(i + 1) + "/on\"";
+        html->openTag("a", on);
+        html->openTag("button", "class=\"button2 button\"");
+        html->print("OFF")->closeTag()->closeTag();
       }
+      html->closeTag()->closeTag();
     }
-    html->println("</table>");
-    html->println("<table class=\"center\"><tr><td><a "
-                  "href=\"/configname\">Configure Devices</a></td>");
-    html->println("<td><a href=\"/server\">Server Control</a></td></tr></table>");
+    html->closeTag()->println();
+    html->openTag("table", "class=\"center\"");
+    html->openTrTag()->openTdTag();
+    html->openTag("a", "href=\"/configname\"")->print("Configure Devices")->closeTag();
+    html->closeTag();
+    html->openTdTag();
+    html->openTag("a", "href=\"/server\"")->print("Server Control")->closeTag();
+    html->closeTag()->closeTag()->closeTag()->println();
     sendPageEnd(html);
     return html;
   }
   int refresh;
 };
 
-class IndexPage : public RootPage {
-public:
-  IndexPage() {
-    setPageName("index");
-    refresh = 10;
-  };
+class RootPage : public FrontPage {
   void conductAction(){};
 } indexPage;
 
@@ -142,8 +81,7 @@ class ButtonMinPage : public BasicPage {
 public:
   ButtonMinPage(int __device, bool __status) : device(__device), status(__status){};
   HTMLBuilder* getHtml(HTMLBuilder* html) {
-    if (GPIO->getPin(GPIO_INPUT, device)->getCurrentStatus() != status)
-      GPIO->getPin(GPIO_PULSE, device)->setCurrentStatus(true);
+    if (GPIO->getPin(GPIO_INPUT, device)->getCurrentStatus() != status) GPIO->getPin(GPIO_PULSE, device)->setCurrentStatus(true);
     html->println((status == true) ? "on" : "off");
     return html;
   };
@@ -161,12 +99,11 @@ public:
   int device;
 };
 
-class ButtonPage : public RootPage {
+class ButtonPage : public FrontPage {
 public:
   ButtonPage(int __device, bool __status) : device(__device), status(__status) { refresh = 1; };
   void conductAction() {
-    if (GPIO->getPin(GPIO_INPUT, device)->getCurrentStatus() != status)
-      GPIO->getPin(GPIO_PULSE, device)->setCurrentStatus(true);
+    if (GPIO->getPin(GPIO_INPUT, device)->getCurrentStatus() != status) GPIO->getPin(GPIO_PULSE, device)->setCurrentStatus(true);
   };
   int device;
   bool status;
@@ -177,123 +114,98 @@ public:
   ServerPage() { setPageName("server"); };
   HTMLBuilder* getHtml(HTMLBuilder* html) {
     sendPageBegin(html);
-    String versionString = "Ver. " + String(ProgramInfo::ProgramNumber) + String(".") +
-                           String(ProgramInfo::MajorVersion) + String(".") + String(ProgramInfo::MinorVersion);
+    String versionString = "Ver. " + String(ProgramInfo::MajorVersion) + String(".") + String(ProgramInfo::MinorVersion);
+    String buildString = "Build Date: " + String(ProgramInfo::compileDate) + " Time: " + String(ProgramInfo::compileTime);
+    String authorString = "Author: " + String(ProgramInfo::AuthorName);
 
-    html->println("<h2>");
-    html->println(ProgramInfo::AppName);
-    html->println("</h2><table class=\"center\"> <tr><td>" + versionString + "</td></tr>");
-    html->println("<tr><td>Build Date: " + String(ProgramInfo::compileDate) +
-                  " Time: " + String(ProgramInfo::compileTime) + "</td></tr>");
-    html->println("<tr><td>Author: John J. Gavel</td></tr></table>");
-    html->println();
+    html->openTag("h2")->print(ProgramInfo::AppName)->closeTag()->println();
+    html->openTag("table", "class=\"center\"");
+    html->openTrTag()->tdTag(versionString)->closeTag();
+    html->openTrTag()->tdTag(buildString)->closeTag();
+    html->openTrTag()->tdTag(authorString)->closeTag()->closeTag();
+    html->brTag()->println();
 
-    html->println("<h2>MAC Address</h2><table class=\"center\"> <tr><td>MAC "
-                  "Address:</td><td>" +
-                  String(POWER_MEMORY.macAddress[0], HEX) + String(":") + String(POWER_MEMORY.macAddress[1], HEX) +
-                  String(":") + String(POWER_MEMORY.macAddress[2], HEX) + String(":") +
-                  String(POWER_MEMORY.macAddress[3], HEX) + String(":") + String(POWER_MEMORY.macAddress[4], HEX) +
-                  String(":") + String(POWER_MEMORY.macAddress[5], HEX) + "</td></tr></table>");
-    html->println("<h2>IP Configuration</h2><table class=\"center\">");
-    html->print("<tr><td>IP Configuration:</td><td>" + String((POWER_MEMORY.isDHCP) ? "DHCP" : "Static") +
-                "</td></tr>");
+    html->openTag("h2")->print("MAC Address")->closeTag()->println();
+    html->openTag("table", "class=\"center\"");
+    html->openTrTag()->tdTag("MAC Address:")->tdTag(getMacString(POWER_MEMORY.macAddress))->closeTag();
+    html->closeTag();
+    html->brTag()->println();
+
+    html->openTag("h2")->print("IP Configuration")->closeTag()->println();
+    html->openTag("table", "class=\"center\"");
+    html->openTrTag()->tdTag("IP Configuration:")->tdTag(String((POWER_MEMORY.isDHCP) ? "DHCP" : "Static"))->closeTag();
     IPAddress ipAddress = ETHERNET->getIPAddress();
-    html->println("<tr><td>IP Address:</td><td>" + String(ipAddress[0]) + String(".") + String(ipAddress[1]) +
-                  String(".") + String(ipAddress[2]) + String(".") + String(ipAddress[3]) + "</td></tr>");
+    html->openTrTag()->tdTag("IP Address:")->tdTag(ipAddress.toString())->closeTag()->println();
     ipAddress = ETHERNET->getDNS();
-    html->println("<tr><td>DNS Server:</td><td>" + String(ipAddress[0]) + String(".") + String(ipAddress[1]) +
-                  String(".") + String(ipAddress[2]) + String(".") + String(ipAddress[3]) + "</td></tr>");
+    html->openTrTag()->tdTag("DNS Server:")->tdTag(ipAddress.toString())->closeTag()->println();
     ipAddress = ETHERNET->getSubnetMask();
-    html->println("<tr><td>Subnet Mask:</td><td>" + String(ipAddress[0]) + String(".") + String(ipAddress[1]) +
-                  String(".") + String(ipAddress[2]) + String(".") + String(ipAddress[3]) + "</td></tr>");
+    html->openTrTag()->tdTag("Subnet Mask:")->tdTag(ipAddress.toString())->closeTag()->println();
     ipAddress = ETHERNET->getGateway();
-    html->println("<tr><td>Gateway:</td><td>" + String(ipAddress[0]) + String(".") + String(ipAddress[1]) +
-                  String(".") + String(ipAddress[2]) + String(".") + String(ipAddress[3]) + "</td></tr></table>");
+    html->openTrTag()->tdTag("Gateway:")->tdTag(ipAddress.toString())->closeTag()->println();
+    html->closeTag();
+    html->brTag()->println();
 
-    html->println("<h2>Power Status</h2><table class=\"center\">");
+    html->openTag("h2")->print("Power Status")->closeTag()->println();
+    html->openTag("table", "class=\"center\"");
     for (int i = 0; i < POWER_DATA->getNumberOfDevices(); i++) {
-      html->print("<tr><td>Power </td><td>");
-      html->print(String(i + 1));
-      html->print(" </td><td>");
-      html->print(String(POWER_DATA->getDeviceName(i)));
-      html->println("</td>");
+      html->openTrTag();
+      html->tdTag("Power ")->tdTag(String(i + 1))->tdTag(String(POWER_DATA->getDeviceName(i)));
+
       if (POWER_DATA->getCurrentRelayStatus(i) == HIGH) {
-        html->println("<td>ON</td></tr>");
+        html->tdTag("ON");
       } else {
-        html->println("<td>OFF</td></tr>");
+        html->tdTag("OFF");
       }
+      html->closeTag();
     }
-    html->println("</table>");
-    html->println("<h2>Hardware Status</h2><table class=\"center\">");
-    html->println("<tr><td>Pico</td><td>" + String((POWER_DATA->getOnline(HWC_COMPUTER)) ? "ON" : "OFF") + "</td>");
-    html->println("<tr><td>Display</td><td>" + String((POWER_DATA->getOnline(HWC_DISPLAY)) ? "ON" : "OFF") + "</td>");
-    html->println("<tr><td>GPIO Ex</td><td>" + String((POWER_DATA->getOnline(HWC_GPIO)) ? "ON" : "OFF") + "</td>");
-    html->println("<tr><td>Temperature</td><td>" + String((POWER_DATA->getOnline(HWC_TEMPERATURE)) ? "ON" : "OFF") +
-                  "</td>");
-    html->println("<tr><td>Ethernet</td><td>" + String((POWER_DATA->getOnline(HWC_ETHERNET)) ? "ON" : "OFF") + "</td>");
-    html->println("<tr><td>EEPROM</td><td>" + String((POWER_DATA->getOnline(HWC_EEPROM)) ? "ON" : "OFF") + "</td>");
-    html->println("</table>");
-    html->println("<tr><a href=\"/ipconfig\">Configure IP Addresses</a></tr>");
-    html->println("<br><tr><a href=\"/upgrade\">Upgrade the Power Switch</a></tr>");
-    html->println("<table class=\"center\">");
-    html->println("<td><a href=\"/\"><button type=\"button\" class=\"button2 "
-                  "button\">Cancel</button></a></td></tr>");
-    html->println("</table>");
-    html->println("<table class=\"center\"><a href=\"/reboot\"><button "
-                  "class=\"button\">REBOOT</button></a></table>");
+    html->closeTag();
+    html->brTag()->println();
+
+    html->openTag("h2")->print("Hardware Status")->closeTag()->println();
+    html->openTag("table", "class=\"center\"");
+    html->openTrTag()->tdTag("Pico")->tdTag(String((POWER_DATA->getOnline(HWC_COMPUTER)) ? "ON" : "OFF"))->closeTag();
+    html->openTrTag()->tdTag("Display")->tdTag(String((POWER_DATA->getOnline(HWC_DISPLAY)) ? "ON" : "OFF"))->closeTag();
+    html->openTrTag()->tdTag("GPIO Ex")->tdTag(String((POWER_DATA->getOnline(HWC_GPIO)) ? "ON" : "OFF"))->closeTag();
+    html->openTrTag()->tdTag("Temperature")->tdTag(String((POWER_DATA->getOnline(HWC_TEMPERATURE)) ? "ON" : "OFF"))->closeTag();
+    html->openTrTag()->tdTag("Ethernet")->tdTag(String((POWER_DATA->getOnline(HWC_ETHERNET)) ? "ON" : "OFF"))->closeTag();
+    html->openTrTag()->tdTag("EEPROM")->tdTag(String((POWER_DATA->getOnline(HWC_EEPROM)) ? "ON" : "OFF"))->closeTag();
+    html->closeTag();
+    html->brTag()->println();
+
+    html->openTag("table", "class=\"center\"");
+    html->openTrTag()->openTdTag()->openTag("a", "href=\"/ipconfig\"")->print("Configure IP Addresses")->closeTag()->closeTag()->closeTag();
+    html->openTrTag()->openTdTag()->openTag("a", "href=\"/upgrade\"")->print("Upgrade the Power Switch")->closeTag()->closeTag()->closeTag();
+    html->openTrTag()->openTdTag()->openTag("a", "href=\"/code\"")->print("Source Code of the Pico Power Switch")->closeTag()->closeTag()->closeTag();
+    html->closeTag();
+    html->brTag()->println();
+
+    html->brTag()->println();
+    html->openTag("table", "class=\"center\"");
+    html->openTrTag()
+        ->openTdTag()
+        ->openTag("a", "href=\"/\"")
+        ->openTag("button", "type=\"button\" class=\"button2 button\"")
+        ->print("Cancel")
+        ->closeTag()
+        ->closeTag()
+        ->closeTag()
+        ->closeTag()
+        ->println();
+    html->openTrTag()
+        ->openTdTag()
+        ->openTag("a", "href=\"/reboot\"")
+        ->openTag("button", "type=\"button\" class=\"button\"")
+        ->print("REBOOT")
+        ->closeTag()
+        ->closeTag()
+        ->closeTag()
+        ->closeTag()
+        ->println();
+    html->closeTag();
     sendPageEnd(html);
     return html;
   }
 } serverPage;
-
-class UploadPage : public BasicPage {
-public:
-  UploadPage() { setPageName("upload"); };
-  HTMLBuilder* getHtml(HTMLBuilder* html) {
-    sendPageBegin(html);
-    html->println("<h2>File Upload<h2/>");
-    html->println("<form method=\"post\" enctype=\"multipart/form-data\">");
-    html->println("<label for=\"file\">File</label>");
-    html->println("<input id=\"file\" name=\"file\" type=\"file\" />");
-    html->println("<button>Upload</button>");
-    html->println("</form><br>");
-    html->println("<td><a href=\"/server\"><button type=\"button\" "
-                  "class=\"button2 button\">Cancel</button></a></td></tr><br>");
-    sendPageEnd(html);
-    return html;
-  }
-} uploadPage;
-
-class UpgradePage : public BasicPage {
-public:
-  UpgradePage() { setPageName("upgrade"); };
-  HTMLBuilder* getHtml(HTMLBuilder* html) {
-    sendPageBegin(html);
-    html->println("<h2>OTA Upgrade<h2/>");
-    html->println("<form method=\"post\" enctype=\"multipart/form-data\">");
-    html->println("<label for=\"file\">File</label>");
-    html->println("<input id=\"file\" name=\"file\" type=\"file\" />");
-    html->println("<button>Upload</button>");
-    html->println("</form><br>");
-    html->println("<td><a href=\"/server\"><button type=\"button\" "
-                  "class=\"button2 button\">Cancel</button></a></td></tr><br>");
-    sendPageEnd(html);
-    return html;
-  }
-} upgradePage;
-
-class RebootPage : public BasicPage {
-public:
-  RebootPage() { setPageName("reboot"); };
-  HTMLBuilder* getHtml(HTMLBuilder* html) {
-    sendPageBegin(html, true, 15);
-    html->println("<p>Rebooting.....</p>");
-    sendPageEnd(html);
-    PORT->println(WARNING, "Reboot in progress.....");
-    WATCHDOG->reboot();
-    return html;
-  }
-} rebootPage;
 
 class ConfigNamePage : public ProcessPage {
 public:
@@ -345,88 +257,126 @@ public:
 
   HTMLBuilder* getHtml(HTMLBuilder* html) {
     sendPageBegin(html);
-    if (parametersProcessed) html->println("<p>Configuration Saved</p>");
-    html->println("<form action=\"/ipconfig\" method=\"GET\">");
+    if (parametersProcessed) html->brTag()->print("Configuration Saved")->brTag()->brTag();
+    html->openTag("form", "action=\"/ipconfig\" method=\"GET\"")->println();
+    html->openTag("table", "class=\"center\"");
 
     bool isDhcp = POWER_MEMORY.isDHCP;
-    html->println("<fieldset><legend>Select IP Address Source</legend>");
-    html->print("<input type=\"radio\" id=\"dhcp0\" name=\"dhcp\" value=\"0\"");
-    html->print((!isDhcp) ? " checked />" : " />");
-    html->println("<label for=\"dhcp0\">Static IP</label>");
-    html->print("<input type=\"radio\" id=\"dhcp1\" name=\"dhcp\" value=\"1\"");
-    html->print((isDhcp) ? " checked />" : " />");
-    html->println("<label for=\"dhcp1\">DHCP</label>");
-    html->println("</fieldset>");
+    html->openTag("fieldset");
+    html->openTag("legend")->print("Select IP Address Source")->closeTag()->println();
+    html->closeTag("input", "type=\"radio\" id=\"dhcp0\" name=\"dhcp\" value=\"0\"" + String((!isDhcp) ? " checked" : ""));
+    html->openTag("label", "for=\"dhcp0\"")->print("Static IP")->closeTag();
+    html->closeTag("input", "type=\"radio\" id=\"dhcp1\" name=\"dhcp\" value=\"1\"" + String((isDhcp) ? " checked" : ""));
+    html->openTag("label", "for=\"dhcp1\"")->print("DHCP")->closeTag();
+    html->closeTag();
 
     html->print("<table class=\"center\">");
 
     byte* address = POWER_MEMORY.ipAddress;
-    html->print("<tr><td>IP Address</td>");
-    html->print("<td><input type=\"text\" maxlength=\"3\" size=\"3\" "
-                "pattern=\"[^\\s]+\" value=\"" +
-                String(address[0]) + "\" name=\"ip0\"\"></td>");
-    html->print("<td><input type=\"text\" maxlength=\"3\" size=\"3\" "
-                "pattern=\"[^\\s]+\" value=\"" +
-                String(address[1]) + "\" name=\"ip1\"\"></td>");
-    html->print("<td><input type=\"text\" maxlength=\"3\" size=\"3\" "
-                "pattern=\"[^\\s]+\" value=\"" +
-                String(address[2]) + "\" name=\"ip2\"\"></td>");
-    html->print("<td><input type=\"text\" maxlength=\"3\" size=\"3\" "
-                "pattern=\"[^\\s]+\" value=\"" +
-                String(address[3]) + "\" name=\"ip3\"\"></td></tr>");
+    html->openTrTag()->tdTag("IPAddress");
+    html->openTdTag()
+        ->closeTag("input", "type=\"text\" maxlength=\"3\" size=\"3\" pattern=\"[^\\s]+\" value=\"" + String(address[0]) + "\" name=\"ip0\"\"")
+        ->closeTag()
+        ->println();
+    html->openTdTag()
+        ->closeTag("input", "type=\"text\" maxlength=\"3\" size=\"3\" pattern=\"[^\\s]+\" value=\"" + String(address[1]) + "\" name=\"ip1\"\"")
+        ->closeTag()
+        ->println();
+    html->openTdTag()
+        ->closeTag("input", "type=\"text\" maxlength=\"3\" size=\"3\" pattern=\"[^\\s]+\" value=\"" + String(address[2]) + "\" name=\"ip2\"\"")
+        ->closeTag()
+        ->println();
+    html->openTdTag()
+        ->closeTag("input", "type=\"text\" maxlength=\"3\" size=\"3\" pattern=\"[^\\s]+\" value=\"" + String(address[3]) + "\" name=\"ip3\"\"")
+        ->closeTag()
+        ->println();
+    html->closeTag()->println();
 
     address = POWER_MEMORY.subnetMask;
-    html->print("<tr><td>Subnet Mask</td>");
-    html->print("<td><input type=\"text\" maxlength=\"3\" size=\"3\" "
-                "pattern=\"[^\\s]+\" value=\"" +
-                String(address[0]) + "\" name=\"sm0\"\"></td>");
-    html->print("<td><input type=\"text\" maxlength=\"3\" size=\"3\" "
-                "pattern=\"[^\\s]+\" value=\"" +
-                String(address[1]) + "\" name=\"sm1\"\"></td>");
-    html->print("<td><input type=\"text\" maxlength=\"3\" size=\"3\" "
-                "pattern=\"[^\\s]+\" value=\"" +
-                String(address[2]) + "\" name=\"sm2\"\"></td>");
-    html->print("<td><input type=\"text\" maxlength=\"3\" size=\"3\" "
-                "pattern=\"[^\\s]+\" value=\"" +
-                String(address[3]) + "\" name=\"sm3\"\"></td></tr>");
+    html->openTrTag()->tdTag("Subnet Mask");
+    html->openTdTag()
+        ->closeTag("input", "type=\"text\" maxlength=\"3\" size=\"3\" pattern=\"[^\\s]+\" value=\"" + String(address[0]) + "\" name=\"sm0\"\"")
+        ->closeTag()
+        ->println();
+    html->openTdTag()
+        ->closeTag("input", "type=\"text\" maxlength=\"3\" size=\"3\" pattern=\"[^\\s]+\" value=\"" + String(address[1]) + "\" name=\"sm1\"\"")
+        ->closeTag()
+        ->println();
+    html->openTdTag()
+        ->closeTag("input", "type=\"text\" maxlength=\"3\" size=\"3\" pattern=\"[^\\s]+\" value=\"" + String(address[2]) + "\" name=\"sm2\"\"")
+        ->closeTag()
+        ->println();
+    html->openTdTag()
+        ->closeTag("input", "type=\"text\" maxlength=\"3\" size=\"3\" pattern=\"[^\\s]+\" value=\"" + String(address[3]) + "\" name=\"sm3\"\"")
+        ->closeTag()
+        ->println();
+    html->closeTag()->println();
 
     address = POWER_MEMORY.gatewayAddress;
-    html->print("<tr><td>Gateway Address</td>");
-    html->print("<td><input type=\"text\" maxlength=\"3\" size=\"3\" "
-                "pattern=\"[^\\s]+\" value=\"" +
-                String(address[0]) + "\" name=\"ga0\"\"></td>");
-    html->print("<td><input type=\"text\" maxlength=\"3\" size=\"3\" "
-                "pattern=\"[^\\s]+\" value=\"" +
-                String(address[1]) + "\" name=\"ga1\"\"></td>");
-    html->print("<td><input type=\"text\" maxlength=\"3\" size=\"3\" "
-                "pattern=\"[^\\s]+\" value=\"" +
-                String(address[2]) + "\" name=\"ga2\"\"></td>");
-    html->print("<td><input type=\"text\" maxlength=\"3\" size=\"3\" "
-                "pattern=\"[^\\s]+\" value=\"" +
-                String(address[3]) + "\" name=\"ga3\"\"></td></tr>");
+    html->openTrTag()->tdTag("Gateway Address");
+    html->openTdTag()
+        ->closeTag("input", "type=\"text\" maxlength=\"3\" size=\"3\" pattern=\"[^\\s]+\" value=\"" + String(address[0]) + "\" name=\"ga0\"\"")
+        ->closeTag()
+        ->println();
+    html->openTdTag()
+        ->closeTag("input", "type=\"text\" maxlength=\"3\" size=\"3\" pattern=\"[^\\s]+\" value=\"" + String(address[1]) + "\" name=\"ga1\"\"")
+        ->closeTag()
+        ->println();
+    html->openTdTag()
+        ->closeTag("input", "type=\"text\" maxlength=\"3\" size=\"3\" pattern=\"[^\\s]+\" value=\"" + String(address[2]) + "\" name=\"ga2\"\"")
+        ->closeTag()
+        ->println();
+    html->openTdTag()
+        ->closeTag("input", "type=\"text\" maxlength=\"3\" size=\"3\" pattern=\"[^\\s]+\" value=\"" + String(address[3]) + "\" name=\"ga3\"\"")
+        ->closeTag()
+        ->println();
+    html->closeTag()->println();
 
     address = POWER_MEMORY.dnsAddress;
-    html->print("<tr><td>DNS Address</td>");
-    html->print("<td><input type=\"text\" maxlength=\"3\" size=\"3\" "
-                "pattern=\"[^\\s]+\" value=\"" +
-                String(address[0]) + "\" name=\"da0\"\"></td>");
-    html->print("<td><input type=\"text\" maxlength=\"3\" size=\"3\" "
-                "pattern=\"[^\\s]+\" value=\"" +
-                String(address[1]) + "\" name=\"da1\"\"></td>");
-    html->print("<td><input type=\"text\" maxlength=\"3\" size=\"3\" "
-                "pattern=\"[^\\s]+\" value=\"" +
-                String(address[2]) + "\" name=\"da2\"\"></td>");
-    html->print("<td><input type=\"text\" maxlength=\"3\" size=\"3\" "
-                "pattern=\"[^\\s]+\" value=\"" +
-                String(address[3]) + "\" name=\"da3\"\"></td></tr>");
+    html->openTrTag()->tdTag("DNS Address");
+    html->openTdTag()
+        ->closeTag("input", "type=\"text\" maxlength=\"3\" size=\"3\" pattern=\"[^\\s]+\" value=\"" + String(address[0]) + "\" name=\"da0\"\"")
+        ->closeTag()
+        ->println();
+    html->openTdTag()
+        ->closeTag("input", "type=\"text\" maxlength=\"3\" size=\"3\" pattern=\"[^\\s]+\" value=\"" + String(address[1]) + "\" name=\"da1\"\"")
+        ->closeTag()
+        ->println();
+    html->openTdTag()
+        ->closeTag("input", "type=\"text\" maxlength=\"3\" size=\"3\" pattern=\"[^\\s]+\" value=\"" + String(address[2]) + "\" name=\"da2\"\"")
+        ->closeTag()
+        ->println();
+    html->openTdTag()
+        ->closeTag("input", "type=\"text\" maxlength=\"3\" size=\"3\" pattern=\"[^\\s]+\" value=\"" + String(address[3]) + "\" name=\"da3\"\"")
+        ->closeTag()
+        ->println();
+    html->closeTag()->println();
 
-    html->print("</table><table class=\"center\"><tr><td><button type=\"submit\" "
-                "class=\"button4 button\">Submit</button></td>");
-    html->println("<td><button type=\"reset\" class=\"button\">Reset</button></td>");
-    html->println("<td><a href=\"/\"><button type=\"button\" class=\"button2 "
-                  "button\">Cancel</button></a></td></tr>");
-    html->println("</table>");
-    html->println("</form>");
+    html->openTag("table", "class=\"center\"")->openTrTag()->println();
+    html->openTdTag()
+        ->openTag("button", "type=\"submit\" class=\"button4 button\"")
+        ->print("Submit")
+        ->closeTag()
+        ->closeTag()
+        ->println()
+        ->openTdTag()
+        ->openTag("button", "type=\"reset\" class=\"button\"")
+        ->print("Reset")
+        ->closeTag()
+        ->closeTag()
+        ->println()
+        ->openTdTag()
+        ->openTag("a", "href=\"/\"")
+        ->openTag("button", "type=\"button\" class=\"button2 button\"")
+        ->print("Cancel")
+        ->closeTag()
+        ->closeTag()
+        ->closeTag()
+        ->println();
+    html->closeTag();
+    html->closeTag();
+    html->closeTag();
+    html->closeTag();
     sendPageEnd(html);
     parametersProcessed = false;
     return html;
@@ -476,38 +426,6 @@ public:
   }
 } configIPPage;
 
-class UpgradeProcessingFilePage : public FilePage {
-public:
-  UpgradeProcessingFilePage() { setPageName("upgrade"); };
-  HTMLBuilder* getHtml(HTMLBuilder* html) {
-    sendPageBegin(html, true, (success) ? 20 : 5);
-    html->print("<p>");
-    if (success)
-      html->print("Processing File Upgrade....");
-    else
-      html->print("Processing File Upgrade FAILED....");
-    html->println("</p>");
-    sendPageEnd(html);
-    return html;
-  }
-} upgradeProcessingFilePage;
-
-class UploadProcessingFilePage : public FilePage {
-public:
-  UploadProcessingFilePage() { setPageName("upload"); };
-  HTMLBuilder* getHtml(HTMLBuilder* html) {
-    sendPageBegin(html, true, 5);
-    html->print("<p>");
-    if (success)
-      html->print("Processing File Upload....");
-    else
-      html->print("Processing File Upload FAILED....");
-    html->println("</p>");
-    sendPageEnd(html);
-    return html;
-  }
-} uploadProcessingFilePage;
-
 void setupServerModule() {
   SERVER->setRootPage(&indexPage);
   SERVER->setUpgradePage(&upgradeProcessingFilePage);
@@ -515,6 +433,7 @@ void setupServerModule() {
   SERVER->setErrorPage(&errorPage);
   SERVER->setPage(&indexPage);
   SERVER->setPage(&serverPage);
+  SERVER->setPage(&codePage);
   SERVER->setPage(&upgradePage);
   SERVER->setPage(&uploadPage);
   SERVER->setPage(&rebootPage);
