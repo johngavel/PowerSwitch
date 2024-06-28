@@ -124,7 +124,7 @@ void PowerSwitch::saveIPData() {
     POWER_MEMORY.subnetMask[1] = address[1];
     POWER_MEMORY.subnetMask[2] = address[2];
     POWER_MEMORY.subnetMask[3] = address[3];
-    EEPROM->breakSeal();
+    EEPROM_FORCE;
   }
   ETHERNET->ipChanged = false;
 }

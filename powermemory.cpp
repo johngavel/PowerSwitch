@@ -13,7 +13,6 @@ void PowerMemory::setup() {
 void PowerMemory::initMemory() {
   randomSeed(rp2040.hwrand32());
   EEPROM_TAKE;
-  EEPROM->breakSeal();
   memory.mem.numberOfDevices = NUM_DEVICES;
   memory.mem.isDHCP = false;
   memory.mem.macAddress[0] = 0xDE;
@@ -47,6 +46,7 @@ void PowerMemory::initMemory() {
   }
   memory.mem.drift = 0;
   EEPROM_GIVE;
+  EEPROM_FORCE;
 }
 
 void PowerMemory::printData() {
@@ -115,7 +115,6 @@ void PowerMemory::setDeviceName(byte device, const char* name, int length) {
     }
   }
   EEPROM_GIVE;
-  EEPROM->breakSeal();
 }
 
 char* PowerMemory::getDeviceName(byte device) {
@@ -202,41 +201,44 @@ static void configure() {
   switch (item) {
   case TempDrift:
     POWER_MEMORY.drift = parameters[0];
-    EEPROM->breakSeal();
+    EEPROM_FORCE;
     break;
   case IpDHCP:
     POWER_MEMORY.isDHCP = parameters[0];
-    EEPROM->breakSeal();
+    EEPROM_FORCE;
     break;
   case IpAddress:
     POWER_MEMORY.ipAddress[0] = parameters[0];
     POWER_MEMORY.ipAddress[1] = parameters[1];
     POWER_MEMORY.ipAddress[2] = parameters[2];
     POWER_MEMORY.ipAddress[3] = parameters[3];
-    EEPROM->breakSeal();
+    EEPROM_FORCE;
     break;
   case IpDNS:
     POWER_MEMORY.dnsAddress[0] = parameters[0];
     POWER_MEMORY.dnsAddress[1] = parameters[1];
     POWER_MEMORY.dnsAddress[2] = parameters[2];
     POWER_MEMORY.dnsAddress[3] = parameters[3];
-    EEPROM->breakSeal();
+    EEPROM_FORCE;
     break;
   case IpSubnet:
     POWER_MEMORY.subnetMask[0] = parameters[0];
     POWER_MEMORY.subnetMask[1] = parameters[1];
     POWER_MEMORY.subnetMask[2] = parameters[2];
     POWER_MEMORY.subnetMask[3] = parameters[3];
-    EEPROM->breakSeal();
+    EEPROM_FORCE;
     break;
   case IpGW:
     POWER_MEMORY.gatewayAddress[0] = parameters[0];
     POWER_MEMORY.gatewayAddress[1] = parameters[1];
     POWER_MEMORY.gatewayAddress[2] = parameters[2];
     POWER_MEMORY.gatewayAddress[3] = parameters[3];
-    EEPROM->breakSeal();
+    EEPROM_FORCE;
     break;
-  case Name: POWER_DATA->setDeviceName(parameters[0] - 1, stringParameter, strlen(stringParameter)); break;
+  case Name:
+    POWER_DATA->setDeviceName(parameters[0] - 1, stringParameter, strlen(stringParameter));
+    EEPROM_FORCE;
+    break;
   case None:
   default:
     PORT->println(HELP, "config name [n] [name] ", "- Sets device name");

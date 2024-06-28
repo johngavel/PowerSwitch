@@ -11,7 +11,7 @@
 #include <watchdog.h>
 
 static ErrorPage errorPage;
-static CodePage codePage;
+static CodePage codePage("PowerSwitch", "https://github.com/johngavel/PowerSwitch");
 static UploadPage uploadPage;
 static UpgradePage upgradePage;
 static RebootPage rebootPage;
@@ -247,7 +247,7 @@ public:
       POWER_DATA->setDeviceName(deviceNumber, list.parameters[i].value.c_str(), list.parameters[i].value.length());
     }
     parametersProcessed = true;
-    EEPROM->breakSeal();
+    EEPROM_FORCE;
   }
 } configNamePage;
 
@@ -422,7 +422,7 @@ public:
         PORT->println(ERROR, "Unknown parameter when processing IP Configuration Page.");
     }
     parametersProcessed = true;
-    EEPROM->breakSeal();
+    EEPROM_FORCE;
   }
 } configIPPage;
 
