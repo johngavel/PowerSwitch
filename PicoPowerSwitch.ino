@@ -9,6 +9,7 @@
 #include <ethernetmodule.h>
 #include <files.h>
 #include <gpio.h>
+#include <license.h>
 #include <onboardled.h>
 #include <scan.h>
 #include <serialport.h>
@@ -36,6 +37,7 @@ PowerMemory powerMemory;
 PowerDisplay powerDisplay;
 
 void setup() {
+  LICENSE;
   setup0Start();
 
   GPIO->configureExpander(0, TCA_ADDRESS);
@@ -63,6 +65,8 @@ void setup() {
   powerSwitch.setup();
 
   GPIO->setup();
+  LICENSE->setup();
+
   WATCHDOG->setup();
   setup0Complete();
 }
