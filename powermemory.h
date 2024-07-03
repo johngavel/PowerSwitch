@@ -44,6 +44,8 @@ public:
   void setCurrentRelayStatus(int i, bool status) { currentRelayStatus[i] = status; };
   bool getOnline(HWC_COMPONENTS i) { return onlineStatus[i]; };
   void setOnline(HWC_COMPONENTS i, bool status) { onlineStatus[i] = status; };
+  void exportMem();
+  void importMem();
 
 private:
   char ErrorString[NAME_MAX_LENGTH];

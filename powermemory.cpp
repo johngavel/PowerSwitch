@@ -1,11 +1,16 @@
 #include "powermemory.h"
 
+#include <export.h>
 #include <serialport.h>
 
 static void configure();
+static void importMemory();
+static void exportMemory();
 
 void PowerMemory::setup() {
   PORT->addCmd("config", "...", "Configure Devices \"config ?\" for more", configure);
+  PORT->addCmd("export", "", "Export Configuration to File System.", exportMemory);
+  PORT->addCmd("import", "", "Import Configuration to File System.", importMemory);
   String error = "ERROR";
   error.toCharArray(ErrorString, NAME_MAX_LENGTH);
 }
@@ -256,4 +261,66 @@ static void configure() {
   }
   PORT->println((commandComplete) ? PASSED : FAILED, "Command Complete");
   PORT->prompt();
+}
+
+void exportMemory() {
+  POWER_DATA->exportMem();
+  PORT->println();
+  PORT->println(PASSED, "Export Complete.");
+  PORT->prompt();
+}
+
+void PowerMemory::exportMem() {
+  Export exportMem(MEMORY_CONFIG_FILE);
+  exportMem.exportData("mac", POWER_MEMORY.macAddress, 6);
+  exportMem.exportData("dhcp", POWER_MEMORY.isDHCP);
+  exportMem.exportData("ip", POWER_MEMORY.ipAddress, 4);
+  exportMem.exportData("dnsAddress", POWER_MEMORY.dnsAddress, 4);
+  exportMem.exportData("subnetMask", POWER_MEMORY.subnetMask, 4);
+  exportMem.exportData("gatewayAddress", POWER_MEMORY.gatewayAddress, 4);
+  exportMem.exportData("numberOfDevices", POWER_MEMORY.numberOfDevices);
+  exportMem.exportData("drift", POWER_MEMORY.drift);
+  for (int i = 0; i < NUM_DEVICES; i++) { exportMem.exportData("deviceName" + String(i), String(POWER_MEMORY.deviceName[i])); }
+  exportMem.close();
+}
+
+void importMemory() {
+  POWER_DATA->importMem();
+  PORT->println();
+  PORT->println(PASSED, "Import Complete.");
+  PORT->prompt();
+}
+
+void PowerMemory::importMem() {
+  Import importMem(MEMORY_CONFIG_FILE);
+  String parameter;
+  String value;
+  while (importMem.importParameter(&parameter)) {
+    if (parameter == "mac")
+      importMem.importData(POWER_MEMORY.macAddress, 6);
+    else if (parameter == "dhcp")
+      importMem.importData(&POWER_MEMORY.isDHCP);
+    else if (parameter == "ip")
+      importMem.importData(POWER_MEMORY.ipAddress, 4);
+    else if (parameter == "dnsAddress")
+      importMem.importData(POWER_MEMORY.dnsAddress, 4);
+    else if (parameter == "subnetMask")
+      importMem.importData(POWER_MEMORY.subnetMask, 4);
+    else if (parameter == "gatewayAddress")
+      importMem.importData(POWER_MEMORY.gatewayAddress, 4);
+    else if (parameter == "numberOfDevices")
+      importMem.importData(&POWER_MEMORY.numberOfDevices);
+    else if (parameter == "drift")
+      importMem.importData(&POWER_MEMORY.drift);
+    else if (parameter.startsWith("deviceName")) {
+      int nameIndex = parameter.substring(String("deviceName").length()).toInt();
+      importMem.importData(&value);
+      strncpy(POWER_MEMORY.deviceName[nameIndex], value.c_str(), NAME_MAX_LENGTH);
+    } else {
+      importMem.importData(&value);
+      PORT->println(ERROR, "Unknown Parameter in File: " + parameter + " - " + value);
+    }
+  }
+
+  EEPROM_FORCE;
 }

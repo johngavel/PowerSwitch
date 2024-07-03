@@ -13,10 +13,13 @@
 static ErrorPage errorPage;
 static CodePage codePage("PowerSwitch", "https://github.com/johngavel/PowerSwitch");
 static UploadPage uploadPage;
+static ExportPage exportPage;
+static ImportPage importPage;
 static UpgradePage upgradePage;
 static RebootPage rebootPage;
 static UpgradeProcessingFilePage upgradeProcessingFilePage;
 static UploadProcessingFilePage uploadProcessingFilePage;
+static ImportProcessingFilePage importProcessingFilePage;
 
 class FrontPage : public BasicPage {
 public:
@@ -60,13 +63,10 @@ public:
       html->closeTag()->closeTag();
     }
     html->closeTag()->println();
-    html->openTag("table", "class=\"center\"");
-    html->openTrTag()->openTdTag();
-    html->openTag("a", "href=\"/configname\"")->print("Configure Devices")->closeTag();
-    html->closeTag();
-    html->openTdTag();
-    html->openTag("a", "href=\"/server\"")->print("Server Control")->closeTag();
-    html->closeTag()->closeTag()->closeTag()->println();
+    html->openTag("table", "class=\"center\"")->openTrTag()->println();
+    html->openTdTag()->openTag("a", "href=\"/configname\"")->print("Configure Devices")->closeTag()->closeTag()->closeTag()->println();
+    html->openTrTag()->openTdTag()->openTag("a", "href=\"/server\"")->print("Server Control")->closeTag()->closeTag()->closeTag()->closeTag()->println();
+
     sendPageEnd(html);
     return html;
   }
@@ -174,6 +174,8 @@ public:
 
     html->openTag("table", "class=\"center\"");
     html->openTrTag()->openTdTag()->openTag("a", "href=\"/ipconfig\"")->print("Configure IP Addresses")->closeTag()->closeTag()->closeTag();
+    html->openTrTag()->openTdTag()->openTag("a", "href=\"/import\"")->print("Import Switch Configuration")->closeTag()->closeTag()->closeTag()->println();
+    html->openTrTag()->openTdTag()->openTag("a", "href=\"/export\"")->print("Export Switch Configuration")->closeTag()->closeTag()->closeTag()->println();
     html->openTrTag()->openTdTag()->openTag("a", "href=\"/upgrade\"")->print("Upgrade the Power Switch")->closeTag()->closeTag()->closeTag();
     html->openTrTag()->openTdTag()->openTag("a", "href=\"/code\"")->print("Source Code of the Pico Power Switch")->closeTag()->closeTag()->closeTag();
     html->closeTag();
@@ -212,39 +214,59 @@ public:
   ConfigNamePage() { setPageName("configname"); };
   HTMLBuilder* getHtml(HTMLBuilder* html) {
     sendPageBegin(html);
-    if (parametersProcessed) html->println("<p>Configuration Saved</p>");
-    html->println("<form action=\"/configname\" method=\"GET\">");
-    html->print("<table class=\"center\">");
+    if (parametersProcessed) html->brTag()->print("Configuration Saved")->brTag()->brTag();
+    html->openTag("form", "action=\"/configname\" method=\"GET\"")->println();
+    html->openTag("table", "class=\"center\"")->println();
     for (byte i = 0; i < NUM_DEVICES; i++) {
-      html->print("<tr><td><p>Power ");
-      html->print(i + 1);
-      html->print(". ");
-      html->print(POWER_DATA->getDeviceName(i));
-      html->print("</td><td>");
-      html->print("<input type=\"text\" maxlength=\"15\" pattern=\"[^\\s]+\" value=\"");
-      html->print(POWER_DATA->getDeviceName(i));
-      html->print("\" name=\"");
-      html->print(i + 1);
-      html->print("\">");
-      html->println("</td></tr>");
+      html->openTrTag()->tdTag("Power " + String(i + 1) + ". ");
+      html->tdTag(POWER_DATA->getDeviceName(i));
+
+      String inputOption = "type=\"text\" maxlength=\"15\" pattern=\"[^\\s]+\" value=\"";
+      inputOption += POWER_DATA->getDeviceName(i);
+      inputOption += "\" name=\"";
+      inputOption += String(i + 1) + "\"";
+      html->openTdTag()->closeTag("input", inputOption);
+      html->closeTag()->closeTag();
     }
-    html->print("<tr><td><button type=\"submit\" class=\"button4 "
-                "button\">Submit</button></td>");
-    html->println("<td><button type=\"reset\" class=\"button\">Reset</button></td>");
-    html->println("<td><a href=\"/\"><button type=\"button\" class=\"button2 "
-                  "button\">Cancel</button></a></td></tr>");
-    html->println("</table>");
-    html->println("<p>(No whitespace, max length is 15 characters)</p>");
-    html->println("</form>");
+    html->closeTag();
+
+    html->brTag();
+    html->print("(No whitespace, max length is 15 characters)")->brTag()->brTag()->println();
+
+    html->openTag("table", "class=\"center\"")->openTrTag()->println();
+    html->openTdTag()
+        ->openTag("button", "type=\"submit\" class=\"button4 button\"")
+        ->print("Submit")
+        ->closeTag()
+        ->closeTag()
+        ->println()
+        ->openTdTag()
+        ->openTag("button", "type=\"reset\" class=\"button\"")
+        ->print("Reset")
+        ->closeTag()
+        ->closeTag()
+        ->println()
+        ->openTdTag()
+        ->openTag("a", "href=\"/\"")
+        ->openTag("button", "type=\"button\" class=\"button2 button\"")
+        ->print("Cancel")
+        ->closeTag()
+        ->closeTag()
+        ->closeTag()
+        ->println();
+    html->closeTag();
+    html->closeTag();
+    html->closeTag();
+
     sendPageEnd(html);
     parametersProcessed = false;
     return html;
   }
 
   void processParameterList() {
-    for (int i = 0; i < list.parameterCount; i++) {
-      int deviceNumber = list.parameters[i].parameter.toInt() - 1;
-      POWER_DATA->setDeviceName(deviceNumber, list.parameters[i].value.c_str(), list.parameters[i].value.length());
+    for (int i = 0; i < LIST->getCount(); i++) {
+      int deviceNumber = LIST->getParameter(i).toInt() - 1;
+      POWER_DATA->setDeviceName(deviceNumber, LIST->getValue(i).c_str(), LIST->getValue(i).length());
     }
     parametersProcessed = true;
     EEPROM_FORCE;
@@ -383,41 +405,41 @@ public:
   }
 
   void processParameterList() {
-    for (int i = 0; i < list.parameterCount; i++) {
-      if (list.parameters[i].parameter.equals("dhcp"))
-        POWER_MEMORY.isDHCP = list.parameters[i].value.toInt();
-      else if (list.parameters[i].parameter.equals("ip0"))
-        POWER_MEMORY.ipAddress[0] = list.parameters[i].value.toInt();
-      else if (list.parameters[i].parameter.equals("ip1"))
-        POWER_MEMORY.ipAddress[1] = list.parameters[i].value.toInt();
-      else if (list.parameters[i].parameter.equals("ip2"))
-        POWER_MEMORY.ipAddress[2] = list.parameters[i].value.toInt();
-      else if (list.parameters[i].parameter.equals("ip3"))
-        POWER_MEMORY.ipAddress[3] = list.parameters[i].value.toInt();
-      else if (list.parameters[i].parameter.equals("sm0"))
-        POWER_MEMORY.subnetMask[0] = list.parameters[i].value.toInt();
-      else if (list.parameters[i].parameter.equals("sm1"))
-        POWER_MEMORY.subnetMask[1] = list.parameters[i].value.toInt();
-      else if (list.parameters[i].parameter.equals("sm2"))
-        POWER_MEMORY.subnetMask[2] = list.parameters[i].value.toInt();
-      else if (list.parameters[i].parameter.equals("sm3"))
-        POWER_MEMORY.subnetMask[3] = list.parameters[i].value.toInt();
-      else if (list.parameters[i].parameter.equals("ga0"))
-        POWER_MEMORY.gatewayAddress[0] = list.parameters[i].value.toInt();
-      else if (list.parameters[i].parameter.equals("ga1"))
-        POWER_MEMORY.gatewayAddress[1] = list.parameters[i].value.toInt();
-      else if (list.parameters[i].parameter.equals("ga2"))
-        POWER_MEMORY.gatewayAddress[2] = list.parameters[i].value.toInt();
-      else if (list.parameters[i].parameter.equals("ga3"))
-        POWER_MEMORY.gatewayAddress[3] = list.parameters[i].value.toInt();
-      else if (list.parameters[i].parameter.equals("da0"))
-        POWER_MEMORY.dnsAddress[0] = list.parameters[i].value.toInt();
-      else if (list.parameters[i].parameter.equals("da1"))
-        POWER_MEMORY.dnsAddress[1] = list.parameters[i].value.toInt();
-      else if (list.parameters[i].parameter.equals("da2"))
-        POWER_MEMORY.dnsAddress[2] = list.parameters[i].value.toInt();
-      else if (list.parameters[i].parameter.equals("da3"))
-        POWER_MEMORY.dnsAddress[3] = list.parameters[i].value.toInt();
+    for (int i = 0; i < LIST->getCount(); i++) {
+      if (LIST->getParameter(i).equals("dhcp"))
+        POWER_MEMORY.isDHCP = LIST->getValue(i).toInt();
+      else if (LIST->getParameter(i).equals("ip0"))
+        POWER_MEMORY.ipAddress[0] = LIST->getValue(i).toInt();
+      else if (LIST->getParameter(i).equals("ip1"))
+        POWER_MEMORY.ipAddress[1] = LIST->getValue(i).toInt();
+      else if (LIST->getParameter(i).equals("ip2"))
+        POWER_MEMORY.ipAddress[2] = LIST->getValue(i).toInt();
+      else if (LIST->getParameter(i).equals("ip3"))
+        POWER_MEMORY.ipAddress[3] = LIST->getValue(i).toInt();
+      else if (LIST->getParameter(i).equals("sm0"))
+        POWER_MEMORY.subnetMask[0] = LIST->getValue(i).toInt();
+      else if (LIST->getParameter(i).equals("sm1"))
+        POWER_MEMORY.subnetMask[1] = LIST->getValue(i).toInt();
+      else if (LIST->getParameter(i).equals("sm2"))
+        POWER_MEMORY.subnetMask[2] = LIST->getValue(i).toInt();
+      else if (LIST->getParameter(i).equals("sm3"))
+        POWER_MEMORY.subnetMask[3] = LIST->getValue(i).toInt();
+      else if (LIST->getParameter(i).equals("ga0"))
+        POWER_MEMORY.gatewayAddress[0] = LIST->getValue(i).toInt();
+      else if (LIST->getParameter(i).equals("ga1"))
+        POWER_MEMORY.gatewayAddress[1] = LIST->getValue(i).toInt();
+      else if (LIST->getParameter(i).equals("ga2"))
+        POWER_MEMORY.gatewayAddress[2] = LIST->getValue(i).toInt();
+      else if (LIST->getParameter(i).equals("ga3"))
+        POWER_MEMORY.gatewayAddress[3] = LIST->getValue(i).toInt();
+      else if (LIST->getParameter(i).equals("da0"))
+        POWER_MEMORY.dnsAddress[0] = LIST->getValue(i).toInt();
+      else if (LIST->getParameter(i).equals("da1"))
+        POWER_MEMORY.dnsAddress[1] = LIST->getValue(i).toInt();
+      else if (LIST->getParameter(i).equals("da2"))
+        POWER_MEMORY.dnsAddress[2] = LIST->getValue(i).toInt();
+      else if (LIST->getParameter(i).equals("da3"))
+        POWER_MEMORY.dnsAddress[3] = LIST->getValue(i).toInt();
       else
         PORT->println(ERROR, "Unknown parameter when processing IP Configuration Page.");
     }
@@ -430,12 +452,15 @@ void setupServerModule() {
   SERVER->setRootPage(&indexPage);
   SERVER->setUpgradePage(&upgradeProcessingFilePage);
   SERVER->setUploadPage(&uploadProcessingFilePage);
+  SERVER->setUploadPage(&importProcessingFilePage);
   SERVER->setErrorPage(&errorPage);
   SERVER->setPage(&indexPage);
   SERVER->setPage(&serverPage);
   SERVER->setPage(&codePage);
   SERVER->setPage(&upgradePage);
   SERVER->setPage(&uploadPage);
+  SERVER->setPage(&exportPage);
+  SERVER->setPage(&importPage);
   SERVER->setPage(&rebootPage);
   SERVER->setPage(&configNamePage);
   SERVER->setPage(&configIPPage);
