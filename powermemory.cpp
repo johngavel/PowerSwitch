@@ -2,15 +2,16 @@
 
 #include <export.h>
 #include <serialport.h>
+#include <termcmd.h>
 
-static void configure();
-static void importMemory();
-static void exportMemory();
+static void configure(Terminal* terminal);
+static void importMemory(Terminal* terminal);
+static void exportMemory(Terminal* terminal);
 
 void PowerMemory::setup() {
-  PORT->addCmd("config", "...", "Configure Devices \"config ?\" for more", configure);
-  PORT->addCmd("export", "", "Export Configuration to File System.", exportMemory);
-  PORT->addCmd("import", "", "Import Configuration to File System.", importMemory);
+  TERM_CMD->addCmd("config", "...", "Configure Devices \"config ?\" for more", configure);
+  TERM_CMD->addCmd("export", "", "Export Configuration to File System.", exportMemory);
+  TERM_CMD->addCmd("import", "", "Import Configuration to File System.", importMemory);
   String error = "ERROR";
   error.toCharArray(ErrorString, NAME_MAX_LENGTH);
 }
@@ -54,48 +55,48 @@ void PowerMemory::initMemory() {
   EEPROM_FORCE;
 }
 
-void PowerMemory::printData() {
+void PowerMemory::printData(Terminal* terminal) {
   EEPROM_TAKE;
-  PORT->print(INFO, "MAC: ");
-  PORT->print(INFO, String(memory.mem.macAddress[0], HEX) + ":");
-  PORT->print(INFO, String(memory.mem.macAddress[1], HEX) + ":");
-  PORT->print(INFO, String(memory.mem.macAddress[2], HEX) + ":");
-  PORT->print(INFO, String(memory.mem.macAddress[3], HEX) + ":");
-  PORT->print(INFO, String(memory.mem.macAddress[4], HEX) + ":");
-  PORT->println(INFO, String(memory.mem.macAddress[5], HEX));
-  PORT->println(INFO, "IP Address is " + String((memory.mem.isDHCP) ? "DHCP" : "Static"));
-  PORT->print(INFO, "IP Address: ");
-  PORT->print(INFO, String(memory.mem.ipAddress[0]) + ".");
-  PORT->print(INFO, String(memory.mem.ipAddress[1]) + ".");
-  PORT->print(INFO, String(memory.mem.ipAddress[2]) + ".");
-  PORT->println(INFO, String(memory.mem.ipAddress[3]));
-  PORT->print(INFO, "Subnet Mask: ");
-  PORT->print(INFO, String(memory.mem.subnetMask[0]) + ".");
-  PORT->print(INFO, String(memory.mem.subnetMask[1]) + ".");
-  PORT->print(INFO, String(memory.mem.subnetMask[2]) + ".");
-  PORT->println(INFO, String(memory.mem.subnetMask[3]));
-  PORT->print(INFO, "Gateway: ");
-  PORT->print(INFO, String(memory.mem.gatewayAddress[0]) + ".");
-  PORT->print(INFO, String(memory.mem.gatewayAddress[1]) + ".");
-  PORT->print(INFO, String(memory.mem.gatewayAddress[2]) + ".");
-  PORT->println(INFO, String(memory.mem.gatewayAddress[3]));
-  PORT->print(INFO, "DNS Address: ");
-  PORT->print(INFO, String(memory.mem.dnsAddress[0]) + ".");
-  PORT->print(INFO, String(memory.mem.dnsAddress[1]) + ".");
-  PORT->print(INFO, String(memory.mem.dnsAddress[2]) + ".");
-  PORT->println(INFO, String(memory.mem.dnsAddress[3]));
-  PORT->print(INFO, "Num Dev: ");
-  PORT->println(INFO, String(getNumberOfDevices()));
+  terminal->print(INFO, "MAC: ");
+  terminal->print(INFO, String(memory.mem.macAddress[0], HEX) + ":");
+  terminal->print(INFO, String(memory.mem.macAddress[1], HEX) + ":");
+  terminal->print(INFO, String(memory.mem.macAddress[2], HEX) + ":");
+  terminal->print(INFO, String(memory.mem.macAddress[3], HEX) + ":");
+  terminal->print(INFO, String(memory.mem.macAddress[4], HEX) + ":");
+  terminal->println(INFO, String(memory.mem.macAddress[5], HEX));
+  terminal->println(INFO, "IP Address is " + String((memory.mem.isDHCP) ? "DHCP" : "Static"));
+  terminal->print(INFO, "IP Address: ");
+  terminal->print(INFO, String(memory.mem.ipAddress[0]) + ".");
+  terminal->print(INFO, String(memory.mem.ipAddress[1]) + ".");
+  terminal->print(INFO, String(memory.mem.ipAddress[2]) + ".");
+  terminal->println(INFO, String(memory.mem.ipAddress[3]));
+  terminal->print(INFO, "Subnet Mask: ");
+  terminal->print(INFO, String(memory.mem.subnetMask[0]) + ".");
+  terminal->print(INFO, String(memory.mem.subnetMask[1]) + ".");
+  terminal->print(INFO, String(memory.mem.subnetMask[2]) + ".");
+  terminal->println(INFO, String(memory.mem.subnetMask[3]));
+  terminal->print(INFO, "Gateway: ");
+  terminal->print(INFO, String(memory.mem.gatewayAddress[0]) + ".");
+  terminal->print(INFO, String(memory.mem.gatewayAddress[1]) + ".");
+  terminal->print(INFO, String(memory.mem.gatewayAddress[2]) + ".");
+  terminal->println(INFO, String(memory.mem.gatewayAddress[3]));
+  terminal->print(INFO, "DNS Address: ");
+  terminal->print(INFO, String(memory.mem.dnsAddress[0]) + ".");
+  terminal->print(INFO, String(memory.mem.dnsAddress[1]) + ".");
+  terminal->print(INFO, String(memory.mem.dnsAddress[2]) + ".");
+  terminal->println(INFO, String(memory.mem.dnsAddress[3]));
+  terminal->print(INFO, "Num Dev: ");
+  terminal->println(INFO, String(getNumberOfDevices()));
   for (int i = 0; i < getNumberOfDevices(); i++) {
-    PORT->print(INFO, "Name ");
-    PORT->print(INFO, String(i + 1));
-    PORT->print(INFO, ": ");
+    terminal->print(INFO, "Name ");
+    terminal->print(INFO, String(i + 1));
+    terminal->print(INFO, ": ");
     EEPROM_GIVE;
-    PORT->println(INFO, String(getDeviceName(i)));
+    terminal->println(INFO, String(getDeviceName(i)));
     EEPROM_TAKE;
   }
-  PORT->print(INFO, "Temperature Drift: ");
-  PORT->println(INFO, String(memory.mem.drift));
+  terminal->print(INFO, "Temperature Drift: ");
+  terminal->println(INFO, String(memory.mem.drift));
   EEPROM_GIVE;
 }
 
@@ -133,7 +134,7 @@ char* PowerMemory::getDeviceName(byte device) {
 
 enum ConfigItem { None = 0, TempDrift, IpDHCP, IpAddress, IpDNS, IpSubnet, IpGW, Name };
 
-static void configure() {
+static void configure(Terminal* terminal) {
   char* value;
   ConfigItem item = None;
   unsigned long parameters[4];
@@ -142,11 +143,11 @@ static void configure() {
   bool requiresStringParameter = false;
   bool commandComplete = true;
 
-  PORT->println();
-  value = PORT->readParameter();
+  terminal->println();
+  value = terminal->readParameter();
 
   if (value == NULL) {
-    PORT->println(WARNING, "Missing any parameters....");
+    terminal->println(WARNING, "Missing any parameters....");
     commandComplete = false;
     item = None;
   } else if (strncmp("temp", value, 4) == 0) {
@@ -174,33 +175,33 @@ static void configure() {
   } else if ((strncmp("?", value, 1) == 0) || (strncmp("help", value, 1) == 0)) {
     item = None;
   } else {
-    PORT->print(WARNING, "Invalid Config: <");
-    PORT->print(WARNING, value);
-    PORT->println(WARNING, ">");
+    terminal->print(WARNING, "Invalid Config: <");
+    terminal->print(WARNING, value);
+    terminal->println(WARNING, ">");
     item = None;
     commandComplete = false;
   }
   for (unsigned long i = 0; i < count; i++) {
-    value = PORT->readParameter();
+    value = terminal->readParameter();
     if (value == NULL) {
       item = None;
       count = 0;
       requiresStringParameter = false;
       commandComplete = false;
-      PORT->println(WARNING, "Missing Parameters in config");
+      terminal->println(WARNING, "Missing Parameters in config");
       break;
     } else {
       parameters[i] = atoi(value);
     }
   }
   if (requiresStringParameter == true) {
-    stringParameter = PORT->readParameter();
+    stringParameter = terminal->readParameter();
     if (stringParameter == NULL) {
       item = None;
       count = 0;
       requiresStringParameter = false;
       commandComplete = false;
-      PORT->println(WARNING, "Missing Parameters in config");
+      terminal->println(WARNING, "Missing Parameters in config");
     }
   }
   switch (item) {
@@ -246,28 +247,28 @@ static void configure() {
     break;
   case None:
   default:
-    PORT->println(HELP, "config name [n] [name] ", "- Sets device name");
-    PORT->println(HELP, "config temp [n]        ", "- Set the drift for the temperature sensor");
-    PORT->println(HELP, "config dhcp [0|1]      ", "- 0, turns off DHCP; 1, turns on DHCP");
-    PORT->println(HELP, "config ip [n] [n] [n] [n]     ", "- Sets the IP address n.n.n.n");
-    PORT->println(HELP, "config dns [n] [n] [n] [n]    ", "- Sets the DNS address n.n.n.n");
-    PORT->println(HELP, "config gw [n] [n] [n] [n]     ", "- Sets the Gateway address n.n.n.n");
-    PORT->println(HELP, "config subnet [n] [n] [n] [n] ", "- Sets the Subnet Mask n.n.n.n");
-    PORT->println(HELP, "config help/?          ", "- Print config Help");
-    PORT->println();
-    PORT->println(HELP, "Note: Addresses use a space seperator, so "
-                        "\"192.168.168.4\" is \"192 168 168 4\"");
-    PORT->println(HELP, "      Must Reboot the system for some changes to take effect");
+    terminal->println(HELP, "config name [n] [name] ", "- Sets device name");
+    terminal->println(HELP, "config temp [n]        ", "- Set the drift for the temperature sensor");
+    terminal->println(HELP, "config dhcp [0|1]      ", "- 0, turns off DHCP; 1, turns on DHCP");
+    terminal->println(HELP, "config ip [n] [n] [n] [n]     ", "- Sets the IP address n.n.n.n");
+    terminal->println(HELP, "config dns [n] [n] [n] [n]    ", "- Sets the DNS address n.n.n.n");
+    terminal->println(HELP, "config gw [n] [n] [n] [n]     ", "- Sets the Gateway address n.n.n.n");
+    terminal->println(HELP, "config subnet [n] [n] [n] [n] ", "- Sets the Subnet Mask n.n.n.n");
+    terminal->println(HELP, "config help/?          ", "- Print config Help");
+    terminal->println();
+    terminal->println(HELP, "Note: Addresses use a space seperator, so "
+                            "\"192.168.168.4\" is \"192 168 168 4\"");
+    terminal->println(HELP, "      Must Reboot the system for some changes to take effect");
   }
-  PORT->println((commandComplete) ? PASSED : FAILED, "Command Complete");
-  PORT->prompt();
+  terminal->println((commandComplete) ? PASSED : FAILED, "Command Complete");
+  terminal->prompt();
 }
 
-void exportMemory() {
+void exportMemory(Terminal* terminal) {
   POWER_DATA->exportMem();
-  PORT->println();
-  PORT->println(PASSED, "Export Complete.");
-  PORT->prompt();
+  terminal->println();
+  terminal->println(PASSED, "Export Complete.");
+  terminal->prompt();
 }
 
 void PowerMemory::exportMem() {
@@ -284,11 +285,11 @@ void PowerMemory::exportMem() {
   exportMem.close();
 }
 
-void importMemory() {
+void importMemory(Terminal* terminal) {
   POWER_DATA->importMem();
-  PORT->println();
-  PORT->println(PASSED, "Import Complete.");
-  PORT->prompt();
+  terminal->println();
+  terminal->println(PASSED, "Import Complete.");
+  terminal->prompt();
 }
 
 void PowerMemory::importMem() {
@@ -318,7 +319,7 @@ void PowerMemory::importMem() {
       strncpy(POWER_MEMORY.deviceName[nameIndex], value.c_str(), NAME_MAX_LENGTH);
     } else {
       importMem.importData(&value);
-      PORT->println(ERROR, "Unknown Parameter in File: " + parameter + " - " + value);
+      CONSOLE->println(ERROR, "Unknown Parameter in File: " + parameter + " - " + value);
     }
   }
 

@@ -7,13 +7,14 @@
 #include <screen.h>
 #include <serialport.h>
 #include <temperature.h>
+#include <termcmd.h>
 
-static void minimalist();
-void testOutput();
+static void minimalist(Terminal* terminal);
+void testOutput(Terminal* terminal);
 
 void PowerSwitch::setupTask() {
-  PORT->addCmd("min", "", "Help for the minimalist http requests", minimalist);
-  PORT->addCmd("test", "", "Tests all of the Relay Commands and Status GPIO", testOutput);
+  TERM_CMD->addCmd("min", "", "Help for the minimalist http requests", minimalist);
+  TERM_CMD->addCmd("test", "", "Tests all of the Relay Commands and Status GPIO", testOutput);
 
   GPIO->configurePinLED(GPIO_INTERNAL, 6, GPIO_SINK, 0, "Debug LED 1");
   GPIO->configurePinLED(GPIO_INTERNAL, 7, GPIO_SINK, 1, "Debug LED 2");
@@ -129,41 +130,41 @@ void PowerSwitch::saveIPData() {
   ETHERNET->ipChanged = false;
 }
 
-static void minimalist() {
-  PORT->println();
-  PORT->println(INFO, "For use in automation, there are minimalist HTTP "
-                      "requests and responses.");
-  PORT->println(INFO, "To make use of these, open a telnet session to the "
-                      "power module on port 80.");
-  PORT->println(INFO, "To turn on a switch - \"GET /on/[n]\" the response is \"on\".");
-  PORT->println(INFO, "To turn off a switch - \"GET /off/[n]\" the response is \"off\".");
-  PORT->println(INFO, "To check the status of a switch - \"GET /stat/[n]\" the "
-                      "response is \"on\" or \"off\".");
-  PORT->println(INFO, "[n] is the switch number between 1 and " + String(NUM_DEVICES));
-  PORT->println();
-  PORT->println(INFO, "The purpose of these minimalist http commands is to enable the coder");
-  PORT->println(INFO, "to make use of the power switch without the overhead of http.");
-  PORT->prompt();
+static void minimalist(Terminal* terminal) {
+  terminal->println();
+  terminal->println(INFO, "For use in automation, there are minimalist HTTP "
+                          "requests and responses.");
+  terminal->println(INFO, "To make use of these, open a telnet session to the "
+                          "power module on port 80.");
+  terminal->println(INFO, "To turn on a switch - \"GET /on/[n]\" the response is \"on\".");
+  terminal->println(INFO, "To turn off a switch - \"GET /off/[n]\" the response is \"off\".");
+  terminal->println(INFO, "To check the status of a switch - \"GET /stat/[n]\" the "
+                          "response is \"on\" or \"off\".");
+  terminal->println(INFO, "[n] is the switch number between 1 and " + String(NUM_DEVICES));
+  terminal->println();
+  terminal->println(INFO, "The purpose of these minimalist http commands is to enable the coder");
+  terminal->println(INFO, "to make use of the power switch without the overhead of http.");
+  terminal->prompt();
 }
 
-void testOutput() {
+void testOutput(Terminal* terminal) {
   int numberOfDevices = POWER_DATA->getNumberOfDevices();
   bool firstState;
   bool secondState;
   bool thirdState;
   bool error = false;
   bool overall = false;
-  PORT->println();
-  PORT->println(INFO, "Testing Output Ports");
-  PORT->print(INFO, "Output Ports: ");
-  PORT->println(INFO, String(numberOfDevices));
+  terminal->println();
+  terminal->println(INFO, "Testing Output Ports");
+  terminal->print(INFO, "Output Ports: ");
+  terminal->println(INFO, String(numberOfDevices));
   for (int i = 1; i <= numberOfDevices; i++) {
     error = false;
     rp2040.wdt_reset();
-    PORT->print(INFO, "Testing Port: ");
-    PORT->print(INFO, String(i));
-    PORT->print(INFO, "; Name: ");
-    PORT->println(INFO, String(POWER_DATA->getDeviceName(i)));
+    terminal->print(INFO, "Testing Port: ");
+    terminal->print(INFO, String(i));
+    terminal->print(INFO, "; Name: ");
+    terminal->println(INFO, String(POWER_DATA->getDeviceName(i)));
     firstState = GPIO->getPin(GPIO_INPUT, i)->getCurrentStatus();
     GPIO->getPin(GPIO_PULSE, i)->setCurrentStatus(true);
     delay(1000);
@@ -177,25 +178,25 @@ void testOutput() {
     if (thirdState != firstState) error = true;
 
     if (error) {
-      PORT->print(ERROR, "Output Port ");
-      PORT->print(WARNING, String(i));
-      PORT->println(WARNING, " Failed");
-      PORT->print(ERROR, "First State: ");
-      PORT->println(WARNING, (firstState) ? "HIGH" : "LOW");
-      PORT->print(ERROR, "Second State: ");
-      PORT->println(WARNING, (secondState) ? "HIGH" : "LOW");
-      PORT->print(ERROR, "Third State: ");
-      PORT->println(WARNING, (thirdState) ? "HIGH" : "LOW");
+      terminal->print(ERROR, "Output Port ");
+      terminal->print(WARNING, String(i));
+      terminal->println(WARNING, " Failed");
+      terminal->print(ERROR, "First State: ");
+      terminal->println(WARNING, (firstState) ? "HIGH" : "LOW");
+      terminal->print(ERROR, "Second State: ");
+      terminal->println(WARNING, (secondState) ? "HIGH" : "LOW");
+      terminal->print(ERROR, "Third State: ");
+      terminal->println(WARNING, (thirdState) ? "HIGH" : "LOW");
     } else {
-      PORT->print(INFO, "SUCCESS: Output Port ");
-      PORT->print(INFO, String(i));
-      PORT->println(INFO, " Passed");
+      terminal->print(INFO, "SUCCESS: Output Port ");
+      terminal->print(INFO, String(i));
+      terminal->println(INFO, " Passed");
     }
     overall |= error;
   }
   if (overall)
-    PORT->println(FAILED, "ERROR: Output Port Test Failed");
+    terminal->println(FAILED, "ERROR: Output Port Test Failed");
   else
-    PORT->println(PASSED, "SUCCESS: Output Port Test Passed");
-  PORT->prompt();
+    terminal->println(PASSED, "SUCCESS: Output Port Test Passed");
+  terminal->prompt();
 }

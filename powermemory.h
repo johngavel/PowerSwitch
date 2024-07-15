@@ -1,6 +1,7 @@
 #ifndef __POWER_MEMORY
 #define __POWER_MEMORY
 #include <eeprom.h>
+#include <terminal.h>
 
 #define NUM_DEVICES 5
 #define DEBUG_LEDS 6
@@ -32,7 +33,7 @@ public:
   MemoryUnion memory;
   void setup();
   void initMemory();
-  void printData();
+  void printData(Terminal* terminal);
   unsigned char* getData();
   unsigned long getLength();
 

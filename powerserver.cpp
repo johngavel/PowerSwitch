@@ -134,13 +134,13 @@ public:
     html->openTag("h2")->print("IP Configuration")->closeTag()->println();
     html->openTag("table", "class=\"center\"");
     html->openTrTag()->tdTag("IP Configuration:")->tdTag(String((POWER_MEMORY.isDHCP) ? "DHCP" : "Static"))->closeTag();
-    IPAddress ipAddress = ETHERNET->getIPAddress();
+    IPAddress ipAddress = NIC->getIPAddress();
     html->openTrTag()->tdTag("IP Address:")->tdTag(ipAddress.toString())->closeTag()->println();
-    ipAddress = ETHERNET->getDNS();
+    ipAddress = NIC->getDNS();
     html->openTrTag()->tdTag("DNS Server:")->tdTag(ipAddress.toString())->closeTag()->println();
-    ipAddress = ETHERNET->getSubnetMask();
+    ipAddress = NIC->getSubnetMask();
     html->openTrTag()->tdTag("Subnet Mask:")->tdTag(ipAddress.toString())->closeTag()->println();
-    ipAddress = ETHERNET->getGateway();
+    ipAddress = NIC->getGateway();
     html->openTrTag()->tdTag("Gateway:")->tdTag(ipAddress.toString())->closeTag()->println();
     html->closeTag();
     html->brTag()->println();
@@ -441,7 +441,7 @@ public:
       else if (LIST->getParameter(i).equals("da3"))
         POWER_MEMORY.dnsAddress[3] = LIST->getValue(i).toInt();
       else
-        PORT->println(ERROR, "Unknown parameter when processing IP Configuration Page.");
+        CONSOLE->println(ERROR, "Unknown parameter when processing IP Configuration Page.");
     }
     parametersProcessed = true;
     EEPROM_FORCE;

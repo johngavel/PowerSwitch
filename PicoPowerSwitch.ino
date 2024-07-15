@@ -15,6 +15,7 @@
 #include <serialport.h>
 #include <servermodule.h>
 #include <startup.h>
+#include <telnet.h>
 #include <temperature.h>
 #include <watchdog.h>
 
@@ -59,8 +60,11 @@ void setup() {
   ETHERNET->configure(POWER_MEMORY.macAddress, POWER_MEMORY.isDHCP, POWER_MEMORY.ipAddress, POWER_MEMORY.dnsAddress, POWER_MEMORY.subnetMask,
                       POWER_MEMORY.gatewayAddress);
   ETHERNET->setup();
+  SERVER->configure(ETHERNET->getServer(HTTP_PORT));
   SERVER->setup();
   setupServerModule();
+  TELNET->configure(ETHERNET->getServer(TELNET_PORT));
+  TELNET->setup();
 
   powerSwitch.setup();
 
@@ -80,6 +84,7 @@ void loop() {
   BLINK->loop();
   ETHERNET->loop();
   SERVER->loop();
+  TELNET->loop();
   PORT->loop();
   TEMPERATURE->loop();
   EEPROM->loop();
