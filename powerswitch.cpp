@@ -7,14 +7,17 @@
 #include <screen.h>
 #include <serialport.h>
 #include <temperature.h>
-#include <termcmd.h>
 
 static void minimalist(Terminal* terminal);
-void testOutput(Terminal* terminal);
+static void testOutput(Terminal* terminal);
+static void onCommand(Terminal* terminal);
+static void offCommand(Terminal* terminal);
 
 void PowerSwitch::setupTask() {
   TERM_CMD->addCmd("min", "", "Help for the minimalist http requests", minimalist);
   TERM_CMD->addCmd("test", "", "Tests all of the Relay Commands and Status GPIO", testOutput);
+  TERM_CMD->addCmd("on", "[n]", "Turn on [n] switch", onCommand);
+  TERM_CMD->addCmd("off", "[n]", "Turn off [n] switch", offCommand);
 
   GPIO->configurePinLED(GPIO_INTERNAL, 6, GPIO_SINK, 0, "Debug LED 1");
   GPIO->configurePinLED(GPIO_INTERNAL, 7, GPIO_SINK, 1, "Debug LED 2");
@@ -130,8 +133,7 @@ void PowerSwitch::saveIPData() {
   ETHERNET->ipChanged = false;
 }
 
-static void minimalist(Terminal* terminal) {
-  terminal->println();
+void minimalist(Terminal* terminal) {
   terminal->println(INFO, "For use in automation, there are minimalist HTTP "
                           "requests and responses.");
   terminal->println(INFO, "To make use of these, open a telnet session to the "
@@ -154,7 +156,6 @@ void testOutput(Terminal* terminal) {
   bool thirdState;
   bool error = false;
   bool overall = false;
-  terminal->println();
   terminal->println(INFO, "Testing Output Ports");
   terminal->print(INFO, "Output Ports: ");
   terminal->println(INFO, String(numberOfDevices));
@@ -198,5 +199,43 @@ void testOutput(Terminal* terminal) {
     terminal->println(FAILED, "ERROR: Output Port Test Failed");
   else
     terminal->println(PASSED, "SUCCESS: Output Port Test Passed");
+  terminal->prompt();
+}
+
+void onCommand(Terminal* terminal) {
+  unsigned long index;
+  GPIO_DESCRIPTION* gpio;
+  char* value;
+  value = terminal->readParameter();
+  if (value != NULL) {
+    index = (unsigned long) atoi(value);
+    gpio = GPIO->getPin(GPIO_PULSE, index);
+    if (gpio != nullptr) {
+      if (GPIO->getPin(GPIO_INPUT, index)->getCurrentStatus() == false) GPIO->getPin(GPIO_PULSE, index)->setCurrentStatus(true);
+    } else {
+      terminal->println(ERROR, "Cannot find Switch Index: " + String(index));
+    }
+  } else {
+    terminal->invalidParameter();
+  }
+  terminal->prompt();
+}
+
+void offCommand(Terminal* terminal) {
+  unsigned long index;
+  GPIO_DESCRIPTION* gpio;
+  char* value;
+  value = terminal->readParameter();
+  if (value != NULL) {
+    index = (unsigned long) atoi(value);
+    gpio = GPIO->getPin(GPIO_PULSE, index);
+    if (gpio != nullptr) {
+      if (GPIO->getPin(GPIO_INPUT, index)->getCurrentStatus() == true) GPIO->getPin(GPIO_PULSE, index)->setCurrentStatus(true);
+    } else {
+      terminal->println(ERROR, "Cannot find Switch Index: " + String(index));
+    }
+  } else {
+    terminal->invalidParameter();
+  }
   terminal->prompt();
 }

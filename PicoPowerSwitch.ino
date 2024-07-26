@@ -24,11 +24,9 @@
 
 const char* ProgramInfo::AppName = "Power Switch";
 const char* ProgramInfo::ShortName = "power";
-const char* ProgramInfo::compileDate = __DATE__;
-const char* ProgramInfo::compileTime = __TIME__;
 const unsigned char ProgramInfo::ProgramNumber = 0x01;
 const unsigned char ProgramInfo::MajorVersion = 0x01;
-const unsigned char ProgramInfo::MinorVersion = 0x13;
+const unsigned char ProgramInfo::MinorVersion = 0x15;
 const char* ProgramInfo::AuthorName = "John J. Gavel";
 const HardwareWire ProgramInfo::hardwarewire = HardwareWire(&Wire, 4, 5);
 const HardwareSerialPort ProgramInfo::hardwareserial = HardwareSerialPort(&Serial1, 0, 1);

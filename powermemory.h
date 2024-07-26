@@ -1,7 +1,7 @@
 #ifndef __POWER_MEMORY
 #define __POWER_MEMORY
+#include <Terminal.h>
 #include <eeprom.h>
-#include <terminal.h>
 
 #define NUM_DEVICES 5
 #define DEBUG_LEDS 6

@@ -2,7 +2,6 @@
 
 #include <export.h>
 #include <serialport.h>
-#include <termcmd.h>
 
 static void configure(Terminal* terminal);
 static void importMemory(Terminal* terminal);
@@ -143,7 +142,6 @@ static void configure(Terminal* terminal) {
   bool requiresStringParameter = false;
   bool commandComplete = true;
 
-  terminal->println();
   value = terminal->readParameter();
 
   if (value == NULL) {
@@ -266,7 +264,6 @@ static void configure(Terminal* terminal) {
 
 void exportMemory(Terminal* terminal) {
   POWER_DATA->exportMem();
-  terminal->println();
   terminal->println(PASSED, "Export Complete.");
   terminal->prompt();
 }
@@ -287,7 +284,6 @@ void PowerMemory::exportMem() {
 
 void importMemory(Terminal* terminal) {
   POWER_DATA->importMem();
-  terminal->println();
   terminal->println(PASSED, "Import Complete.");
   terminal->prompt();
 }
