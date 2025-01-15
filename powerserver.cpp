@@ -74,7 +74,7 @@ public:
 };
 
 class RootPage : public FrontPage {
-  void conductAction(){};
+  void conductAction() {};
 } indexPage;
 
 class ButtonMinPage : public BasicPage {
