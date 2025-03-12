@@ -114,7 +114,8 @@ public:
   ServerPage() { setPageName("server"); };
   HTMLBuilder* getHtml(HTMLBuilder* html) {
     sendPageBegin(html);
-    String versionString = "Ver. " + String(ProgramInfo::MajorVersion) + String(".") + String(ProgramInfo::MinorVersion);
+    String versionString =
+        "Ver. " + String(ProgramInfo::MajorVersion) + String(".") + String(ProgramInfo::MinorVersion) + String(".") + String(ProgramInfo::BuildVersion);
     String buildString = "Build Date: " + String(ProgramInfo::compileDate) + " Time: " + String(ProgramInfo::compileTime);
     String authorString = "Author: " + String(ProgramInfo::AuthorName);
 

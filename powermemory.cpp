@@ -125,8 +125,10 @@ void PowerMemory::setDeviceName(byte device, const char* name, int length) {
 char* PowerMemory::getDeviceName(byte device) {
   char* returnVal;
   EEPROM_TAKE;
-  if (device >= NUM_DEVICES) returnVal = ErrorString;
-  returnVal = memory.mem.deviceName[device];
+  if (device >= NUM_DEVICES)
+    returnVal = ErrorString;
+  else
+    returnVal = memory.mem.deviceName[device];
   EEPROM_GIVE;
   return returnVal;
 }
