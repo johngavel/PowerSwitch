@@ -88,13 +88,13 @@ void loop() {
   TEMPERATURE->loop();
   EEPROM->loop();
   powerSwitch.loop();
-  WATCHDOG->loop();
+  WATCHDOG->tickle();
   delay(1);
 }
 
 void loop1() {
   SCREEN->loop();
   GPIO->loop();
-  WATCHDOG->loop();
+  WATCHDOG->tickle();
   delay(1);
 }
