@@ -1376,7 +1376,7 @@ Discarded input sections
  .text._ZN18Adafruit_SPIDevice5beginEv
                 0x00000000       0x72 /home/user/.cache/arduino/sketches/3C46E38805B37B0CD4124B179EC7764D/libraries/Adafruit_BusIO/Adafruit_SPIDevice.cpp.o
  .text._ZN18Adafruit_SPIDevice8transferEPhj
-                0x00000000      0x13c /home/user/.cache/arduino/sketches/3C46E38805B37B0CD4124B179EC7764D/libraries/Adafruit_BusIO/Adafruit_SPIDevice.cpp.o
+                0x00000000      0x188 /home/user/.cache/arduino/sketches/3C46E38805B37B0CD4124B179EC7764D/libraries/Adafruit_BusIO/Adafruit_SPIDevice.cpp.o
  .text._ZN18Adafruit_SPIDevice8transferEh
                 0x00000000       0x14 /home/user/.cache/arduino/sketches/3C46E38805B37B0CD4124B179EC7764D/libraries/Adafruit_BusIO/Adafruit_SPIDevice.cpp.o
  .text._ZN18Adafruit_SPIDevice16beginTransactionEv
@@ -1399,15 +1399,15 @@ Discarded input sections
                 0x00000000       0x20 /home/user/.cache/arduino/sketches/3C46E38805B37B0CD4124B179EC7764D/libraries/Adafruit_BusIO/Adafruit_SPIDevice.cpp.o
  .text.startup._GLOBAL__sub_I__ZN18Adafruit_SPIDeviceC2Eam8BitOrderhPN7arduino11HardwareSPIE
                 0x00000000        0x2 /home/user/.cache/arduino/sketches/3C46E38805B37B0CD4124B179EC7764D/libraries/Adafruit_BusIO/Adafruit_SPIDevice.cpp.o
- .debug_info    0x00000000     0x4d65 /home/user/.cache/arduino/sketches/3C46E38805B37B0CD4124B179EC7764D/libraries/Adafruit_BusIO/Adafruit_SPIDevice.cpp.o
+ .debug_info    0x00000000     0x4dfe /home/user/.cache/arduino/sketches/3C46E38805B37B0CD4124B179EC7764D/libraries/Adafruit_BusIO/Adafruit_SPIDevice.cpp.o
  .debug_abbrev  0x00000000      0x89a /home/user/.cache/arduino/sketches/3C46E38805B37B0CD4124B179EC7764D/libraries/Adafruit_BusIO/Adafruit_SPIDevice.cpp.o
  .debug_loclists
-                0x00000000      0x960 /home/user/.cache/arduino/sketches/3C46E38805B37B0CD4124B179EC7764D/libraries/Adafruit_BusIO/Adafruit_SPIDevice.cpp.o
+                0x00000000      0x97f /home/user/.cache/arduino/sketches/3C46E38805B37B0CD4124B179EC7764D/libraries/Adafruit_BusIO/Adafruit_SPIDevice.cpp.o
  .debug_aranges
                 0x00000000       0x98 /home/user/.cache/arduino/sketches/3C46E38805B37B0CD4124B179EC7764D/libraries/Adafruit_BusIO/Adafruit_SPIDevice.cpp.o
  .debug_rnglists
                 0x00000000       0xe6 /home/user/.cache/arduino/sketches/3C46E38805B37B0CD4124B179EC7764D/libraries/Adafruit_BusIO/Adafruit_SPIDevice.cpp.o
- .debug_line    0x00000000      0xdf6 /home/user/.cache/arduino/sketches/3C46E38805B37B0CD4124B179EC7764D/libraries/Adafruit_BusIO/Adafruit_SPIDevice.cpp.o
+ .debug_line    0x00000000      0xe2a /home/user/.cache/arduino/sketches/3C46E38805B37B0CD4124B179EC7764D/libraries/Adafruit_BusIO/Adafruit_SPIDevice.cpp.o
  .debug_str     0x00000000     0x3162 /home/user/.cache/arduino/sketches/3C46E38805B37B0CD4124B179EC7764D/libraries/Adafruit_BusIO/Adafruit_SPIDevice.cpp.o
  .comment       0x00000000       0x13 /home/user/.cache/arduino/sketches/3C46E38805B37B0CD4124B179EC7764D/libraries/Adafruit_BusIO/Adafruit_SPIDevice.cpp.o
  .debug_frame   0x00000000      0x1c8 /home/user/.cache/arduino/sketches/3C46E38805B37B0CD4124B179EC7764D/libraries/Adafruit_BusIO/Adafruit_SPIDevice.cpp.o
