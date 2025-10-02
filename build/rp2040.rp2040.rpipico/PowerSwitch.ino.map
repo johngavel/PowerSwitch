@@ -9275,9 +9275,8 @@ LOAD /home/user/.arduino15/packages/rp2040/tools/pqt-gcc/4.1.0-1aec55e/bin/../li
 .rodata         0x10033c40     0x79b8
  *(EXCLUDE_FILE(*libm.a: *libc.a:*lib_a-mem*.o *libgcc.a:) .rodata* .big_const*)
  .rodata._GLOBAL__sub_I__ZN11ProgramInfo7AppNameE.str1.1
-                0x10033c40     0x40f7 /home/user/.cache/arduino/sketches/3C46E38805B37B0CD4124B179EC7764D/sketch/PowerSwitch.ino.cpp.o
+                0x10033c40     0x40f8 /home/user/.cache/arduino/sketches/3C46E38805B37B0CD4124B179EC7764D/sketch/PowerSwitch.ino.cpp.o
                                   0xc (size before relaxing)
- *fill*         0x10037d37        0x1 
  .rodata._ZTV4Task
                 0x10037d38       0x10 /home/user/.cache/arduino/sketches/3C46E38805B37B0CD4124B179EC7764D/sketch/PowerSwitch.ino.cpp.o
                 0x10037d38                _ZTV4Task
@@ -9390,7 +9389,7 @@ LOAD /home/user/.arduino15/packages/rp2040/tools/pqt-gcc/4.1.0-1aec55e/bin/../li
                 0x10037e10       0x10 /home/user/.cache/arduino/sketches/3C46E38805B37B0CD4124B179EC7764D/libraries/GavelScreen/screen.cpp.o
                 0x10037e10                _ZTV6Screen
  .rodata.str1.1
-                0x10037e20      0x205 /home/user/.cache/arduino/sketches/3C46E38805B37B0CD4124B179EC7764D/libraries/GavelScreen/screen.cpp.o
+                0x10037e20      0x206 /home/user/.cache/arduino/sketches/3C46E38805B37B0CD4124B179EC7764D/libraries/GavelScreen/screen.cpp.o
  .rodata._ZL9libraries
                 0x10037e20       0x84 /home/user/.cache/arduino/sketches/3C46E38805B37B0CD4124B179EC7764D/libraries/GavelScreen/screen.cpp.o
  .rodata._ZL14bitmap_VUMeter
@@ -9427,7 +9426,7 @@ LOAD /home/user/.arduino15/packages/rp2040/tools/pqt-gcc/4.1.0-1aec55e/bin/../li
                 0x100392a8       0x10 /home/user/.cache/arduino/sketches/3C46E38805B37B0CD4124B179EC7764D/libraries/GavelArch/serialport.cpp.o
                 0x100392a8                _ZTV10SerialPort
  .rodata.str1.1
-                0x100392b8      0x205 /home/user/.cache/arduino/sketches/3C46E38805B37B0CD4124B179EC7764D/libraries/GavelArch/serialport.cpp.o
+                0x100392b8      0x206 /home/user/.cache/arduino/sketches/3C46E38805B37B0CD4124B179EC7764D/libraries/GavelArch/serialport.cpp.o
  .rodata._ZL9libraries
                 0x100392b8       0x84 /home/user/.cache/arduino/sketches/3C46E38805B37B0CD4124B179EC7764D/libraries/GavelArch/serialport.cpp.o
  .rodata._Z11setup0Startv.str1.1
@@ -9562,7 +9561,7 @@ LOAD /home/user/.arduino15/packages/rp2040/tools/pqt-gcc/4.1.0-1aec55e/bin/../li
                 0x1003a0c0       0x10 /home/user/.cache/arduino/sketches/3C46E38805B37B0CD4124B179EC7764D/libraries/GavelEEPROM/eeprom.cpp.o
                 0x1003a0c0                _ZTV12EEpromMemory
  .rodata.str1.1
-                0x1003a0d0      0x205 /home/user/.cache/arduino/sketches/3C46E38805B37B0CD4124B179EC7764D/libraries/GavelEEPROM/eeprom.cpp.o
+                0x1003a0d0      0x206 /home/user/.cache/arduino/sketches/3C46E38805B37B0CD4124B179EC7764D/libraries/GavelEEPROM/eeprom.cpp.o
  .rodata._ZL9libraries
                 0x1003a0d0       0x84 /home/user/.cache/arduino/sketches/3C46E38805B37B0CD4124B179EC7764D/libraries/GavelEEPROM/eeprom.cpp.o
  .rodata._ZN14EthernetModule3getEv.str1.1
@@ -9584,7 +9583,7 @@ LOAD /home/user/.arduino15/packages/rp2040/tools/pqt-gcc/4.1.0-1aec55e/bin/../li
                 0x1003a1a4       0x18 /home/user/.cache/arduino/sketches/3C46E38805B37B0CD4124B179EC7764D/libraries/GavelEthernet/ethernetmodule.cpp.o
                 0x1003a1a4                _ZTV11WiredServer
  .rodata.str1.1
-                0x1003a1bc      0x205 /home/user/.cache/arduino/sketches/3C46E38805B37B0CD4124B179EC7764D/libraries/GavelEthernet/ethernetmodule.cpp.o
+                0x1003a1bc      0x206 /home/user/.cache/arduino/sketches/3C46E38805B37B0CD4124B179EC7764D/libraries/GavelEthernet/ethernetmodule.cpp.o
  .rodata._ZL9libraries
                 0x1003a1bc       0x84 /home/user/.cache/arduino/sketches/3C46E38805B37B0CD4124B179EC7764D/libraries/GavelEthernet/ethernetmodule.cpp.o
  .rodata._ZN14SimpleTestPage7getHtmlEP11HTMLBuilder.str1.1
@@ -9909,7 +9908,7 @@ LOAD /home/user/.arduino15/packages/rp2040/tools/pqt-gcc/4.1.0-1aec55e/bin/../li
  .rodata._ZN11GPIOManager10printTableEPN15TerminalLibrary8TerminalE.str1.1
                 0x1003a73c       0x69 /home/user/.cache/arduino/sketches/3C46E38805B37B0CD4124B179EC7764D/libraries/GavelGPIO/gpio.cpp.o
  .rodata.str1.1
-                0x1003a73c      0x2bd /home/user/.cache/arduino/sketches/3C46E38805B37B0CD4124B179EC7764D/libraries/GavelGPIO/gpio.cpp.o
+                0x1003a73c      0x2be /home/user/.cache/arduino/sketches/3C46E38805B37B0CD4124B179EC7764D/libraries/GavelGPIO/gpio.cpp.o
  .rodata.CSWTCH.71
                 0x1003a73c       0x2c /home/user/.cache/arduino/sketches/3C46E38805B37B0CD4124B179EC7764D/libraries/GavelGPIO/gpio.cpp.o
  .rodata.CSWTCH.56
@@ -9954,7 +9953,7 @@ LOAD /home/user/.arduino15/packages/rp2040/tools/pqt-gcc/4.1.0-1aec55e/bin/../li
                 0x1003a828       0x10 /home/user/.cache/arduino/sketches/3C46E38805B37B0CD4124B179EC7764D/libraries/GavelTelnet/telnet.cpp.o
                 0x1003a828                _ZTV12TelnetModule
  .rodata.str1.1
-                0x1003a838      0x205 /home/user/.cache/arduino/sketches/3C46E38805B37B0CD4124B179EC7764D/libraries/GavelTelnet/telnet.cpp.o
+                0x1003a838      0x206 /home/user/.cache/arduino/sketches/3C46E38805B37B0CD4124B179EC7764D/libraries/GavelTelnet/telnet.cpp.o
  .rodata._ZL9libraries
                 0x1003a838       0x84 /home/user/.cache/arduino/sketches/3C46E38805B37B0CD4124B179EC7764D/libraries/GavelTelnet/telnet.cpp.o
  .rodata._ZN11Temperature3getEv.str1.1
@@ -9967,7 +9966,7 @@ LOAD /home/user/.arduino15/packages/rp2040/tools/pqt-gcc/4.1.0-1aec55e/bin/../li
                 0x1003a8bc       0x10 /home/user/.cache/arduino/sketches/3C46E38805B37B0CD4124B179EC7764D/libraries/GavelTemperature/temperature.cpp.o
                 0x1003a8bc                _ZTV11Temperature
  .rodata.str1.1
-                0x1003a8cc      0x205 /home/user/.cache/arduino/sketches/3C46E38805B37B0CD4124B179EC7764D/libraries/GavelTemperature/temperature.cpp.o
+                0x1003a8cc      0x206 /home/user/.cache/arduino/sketches/3C46E38805B37B0CD4124B179EC7764D/libraries/GavelTemperature/temperature.cpp.o
  .rodata._ZL9libraries
                 0x1003a8cc       0x84 /home/user/.cache/arduino/sketches/3C46E38805B37B0CD4124B179EC7764D/libraries/GavelTemperature/temperature.cpp.o
  .rodata._ZN8Watchdog3getEv.str1.1
