@@ -6,6 +6,7 @@
 #include <gpio.h>
 #include <serialport.h>
 #include <servermodule.h>
+#include <sseconsole.h>
 #include <stringutils.h>
 #include <temperature.h>
 #include <watchdog.h>
@@ -17,6 +18,7 @@ static ExportPage exportPage;
 static ImportPage importPage;
 static UpgradePage upgradePage;
 static RebootPage rebootPage;
+static TerminalPage terminalPage;
 static UpgradeProcessingFilePage upgradeProcessingFilePage;
 static UploadProcessingFilePage uploadProcessingFilePage;
 static ImportProcessingFilePage importProcessingFilePage;
@@ -179,6 +181,7 @@ public:
     html->openTrTag()->openTdTag()->openTag("a", "href=\"/export\"")->print("Export Switch Configuration")->closeTag()->closeTag()->closeTag()->println();
     html->openTrTag()->openTdTag()->openTag("a", "href=\"/upgrade\"")->print("Upgrade the Power Switch")->closeTag()->closeTag()->closeTag();
     html->openTrTag()->openTdTag()->openTag("a", "href=\"/code\"")->print("Source Code of the Pico Power Switch")->closeTag()->closeTag()->closeTag();
+    html->openTrTag()->openTdTag()->openTag("a", "href=\"/terminal\"")->print("Console Terminal for the Pico Power Switch")->closeTag()->closeTag()->closeTag();
     html->closeTag();
     html->brTag()->println();
 
@@ -465,6 +468,8 @@ void setupServerModule() {
   SERVER->setPage(&rebootPage);
   SERVER->setPage(&configNamePage);
   SERVER->setPage(&configIPPage);
+  SERVER->setPage(&terminalPage);
+  SERVER->setSSEClient(new SSEConsole());
   SERVER->setFormProcessingPage(&configIPPage);
   SERVER->setFormProcessingPage(&configNamePage);
   for (int i = 1; i <= NUM_DEVICES; i++) {
