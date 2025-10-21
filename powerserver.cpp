@@ -1,5 +1,6 @@
 #include "powerserver.h"
 
+#include "favicon.h"
 #include "powermemory.h"
 
 #include <commonhtml.h>
@@ -489,4 +490,5 @@ void setupServerModule() {
     page3->setPageName(String("stat/" + String(i)).c_str());
     SERVER->setPage(page3);
   }
+  SERVER->setFavicon(favicon, favicon_len);
 }
