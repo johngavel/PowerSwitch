@@ -16,14 +16,16 @@ case "$BUILD" in
     ;;
   --pre)
     createfileheader.sh "$CURRENT_DIR"/assets/favicon_blue.ico "$CURRENT_DIR"/favicon.h favicon
-    create_libraries_used.sh --build $HOME_DIR/libraries/GavelLicense ETHERNET_USED TERMINAL_USED TCA9555_USED I2C_EEPROM_USED DHT_SENSOR_LIBRARY_USED DHT_SENSOR_LIBRARY_USED ADAFRUIT_SSD1306_USED ADAFRUIT_GFX_LIBRARY_USED ADAFRUIT_BUSIO_USED ADAFRUIT_UNIFIED_SENSOR_USED
+    create_libraries_used.sh --build $HOME_DIR/libraries/GavelLicense
+    #create_libraries_used.sh --build $HOME_DIR/libraries/GavelLicense ETHERNET_USED TERMINAL_USED TCA9555_USED I2C_EEPROM_USED DHT_SENSOR_LIBRARY_USED ADAFRUIT_SSD1306_USED ADAFRUIT_GFX_LIBRARY_USED ADAFRUIT_BUSIO_USED ADAFRUIT_UNIFIED_SENSOR_USED
     ;;
   --post)
     create_libraries_used.sh --clean $HOME_DIR/libraries/GavelLicense
     ;;
   --build)
     createfileheader.sh "$CURRENT_DIR"/assets/favicon_blue.ico "$CURRENT_DIR"/favicon.h favicon
-    create_libraries_used.sh --build $HOME_DIR/libraries/GavelLicense ETHERNET_USED TERMINAL_USED TCA9555_USED I2C_EEPROM_USED DHT_SENSOR_LIBRARY_USED DHT_SENSOR_LIBRARY_USED ADAFRUIT_SSD1306_USED ADAFRUIT_GFX_LIBRARY_USED ADAFRUIT_BUSIO_USED ADAFRUIT_UNIFIED_SENSOR_USED
+    create_libraries_used.sh --build $HOME_DIR/libraries/GavelLicense
+    #create_libraries_used.sh --build $HOME_DIR/libraries/GavelLicense ETHERNET_USED TERMINAL_USED TCA9555_USED I2C_EEPROM_USED DHT_SENSOR_LIBRARY_USED ADAFRUIT_SSD1306_USED ADAFRUIT_GFX_LIBRARY_USED ADAFRUIT_BUSIO_USED ADAFRUIT_UNIFIED_SENSOR_USED
     ;;
   *)
     log_failed "Invalid Command Argument: $BUILD"
