@@ -55,6 +55,7 @@ void setup() {
   SCREEN->setRefreshScreen(&powerDisplay, 1000);
   SCREEN->setup();
   FILES->setup();
+  LittleFS.begin();
 
   ETHERNET->configure(POWER_MEMORY.macAddress, POWER_MEMORY.isDHCP, POWER_MEMORY.ipAddress, POWER_MEMORY.dnsAddress, POWER_MEMORY.subnetMask,
                       POWER_MEMORY.gatewayAddress);
@@ -71,6 +72,7 @@ void setup() {
   LICENSE->setup();
 
   WATCHDOG->setup();
+  WATCHDOG->setRebootCallback(EEpromMemory::eeprom_force);
   setup0Complete();
 }
 
