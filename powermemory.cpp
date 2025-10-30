@@ -3,9 +3,9 @@
 #include <export.h>
 #include <serialport.h>
 
-static void configure(Terminal* terminal);
-static void importMemory(Terminal* terminal);
-static void exportMemory(Terminal* terminal);
+static void configure(OutputInterface* terminal);
+static void importMemory(OutputInterface* terminal);
+static void exportMemory(OutputInterface* terminal);
 
 void PowerMemory::setup() {
   TERM_CMD->addCmd("config", "...", "Configure Devices \"config ?\" for more", configure);
@@ -54,7 +54,7 @@ void PowerMemory::initMemory() {
   EEPROM_FORCE;
 }
 
-void PowerMemory::printData(Terminal* terminal) {
+void PowerMemory::printData(OutputInterface* terminal) {
   EEPROM_TAKE;
   terminal->print(INFO, "MAC: ");
   terminal->print(INFO, String(memory.mem.macAddress[0], HEX) + ":");
@@ -135,7 +135,7 @@ char* PowerMemory::getDeviceName(byte device) {
 
 enum ConfigItem { None = 0, TempDrift, IpDHCP, IpAddress, IpDNS, IpSubnet, IpGW, Name };
 
-static void configure(Terminal* terminal) {
+static void configure(OutputInterface* terminal) {
   char* value;
   ConfigItem item = None;
   unsigned long parameters[4];
@@ -264,7 +264,7 @@ static void configure(Terminal* terminal) {
   terminal->prompt();
 }
 
-void exportMemory(Terminal* terminal) {
+void exportMemory(OutputInterface* terminal) {
   POWER_DATA->exportMem();
   terminal->println(PASSED, "Export Complete.");
   terminal->prompt();
@@ -284,7 +284,7 @@ void PowerMemory::exportMem() {
   exportMem.close();
 }
 
-void importMemory(Terminal* terminal) {
+void importMemory(OutputInterface* terminal) {
   POWER_DATA->importMem();
   terminal->println(PASSED, "Import Complete.");
   terminal->prompt();

@@ -8,10 +8,10 @@
 #include <serialport.h>
 #include <temperature.h>
 
-static void minimalist(Terminal* terminal);
-static void testOutput(Terminal* terminal);
-static void onCommand(Terminal* terminal);
-static void offCommand(Terminal* terminal);
+static void minimalist(OutputInterface* terminal);
+static void testOutput(OutputInterface* terminal);
+static void onCommand(OutputInterface* terminal);
+static void offCommand(OutputInterface* terminal);
 
 void PowerSwitch::setupTask() {
   TERM_CMD->addCmd("min", "", "Help for the minimalist http requests", minimalist);
@@ -133,7 +133,7 @@ void PowerSwitch::saveIPData() {
   ETHERNET->ipChanged = false;
 }
 
-void minimalist(Terminal* terminal) {
+void minimalist(OutputInterface* terminal) {
   terminal->println(INFO, "For use in automation, there are minimalist HTTP "
                           "requests and responses.");
   terminal->println(INFO, "To make use of these, open a telnet session to the "
@@ -149,7 +149,7 @@ void minimalist(Terminal* terminal) {
   terminal->prompt();
 }
 
-void testOutput(Terminal* terminal) {
+void testOutput(OutputInterface* terminal) {
   int numberOfDevices = POWER_DATA->getNumberOfDevices();
   bool firstState;
   bool secondState;
@@ -202,7 +202,7 @@ void testOutput(Terminal* terminal) {
   terminal->prompt();
 }
 
-void onCommand(Terminal* terminal) {
+void onCommand(OutputInterface* terminal) {
   unsigned long index;
   GPIO_DESCRIPTION* gpio;
   char* value;
@@ -221,7 +221,7 @@ void onCommand(Terminal* terminal) {
   terminal->prompt();
 }
 
-void offCommand(Terminal* terminal) {
+void offCommand(OutputInterface* terminal) {
   unsigned long index;
   GPIO_DESCRIPTION* gpio;
   char* value;
