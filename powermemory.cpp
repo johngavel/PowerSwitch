@@ -177,7 +177,7 @@ static void configure(OutputInterface* terminal) {
   } else {
     terminal->print(WARNING, "Invalid Config: <");
     terminal->print(WARNING, value);
-    terminal->println(WARNING, ">");
+    terminal->println(INFO, ">");
     item = None;
     commandComplete = false;
   }

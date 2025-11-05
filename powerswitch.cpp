@@ -181,13 +181,13 @@ void testOutput(OutputInterface* terminal) {
     if (error) {
       terminal->print(ERROR, "Output Port ");
       terminal->print(WARNING, String(i));
-      terminal->println(WARNING, " Failed");
+      terminal->println(INFO, " Failed");
       terminal->print(ERROR, "First State: ");
-      terminal->println(WARNING, (firstState) ? "HIGH" : "LOW");
+      terminal->println(INFO, (firstState) ? "HIGH" : "LOW");
       terminal->print(ERROR, "Second State: ");
-      terminal->println(WARNING, (secondState) ? "HIGH" : "LOW");
+      terminal->println(INFO, (secondState) ? "HIGH" : "LOW");
       terminal->print(ERROR, "Third State: ");
-      terminal->println(WARNING, (thirdState) ? "HIGH" : "LOW");
+      terminal->println(INFO, (thirdState) ? "HIGH" : "LOW");
     } else {
       terminal->print(INFO, "SUCCESS: Output Port ");
       terminal->print(INFO, String(i));
