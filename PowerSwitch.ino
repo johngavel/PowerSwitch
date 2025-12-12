@@ -57,8 +57,8 @@ void setup() {
   FILES->setup();
   LittleFS.begin();
 
-  ETHERNET->configure(POWER_MEMORY.macAddress, POWER_MEMORY.isDHCP, POWER_MEMORY.ipAddress, POWER_MEMORY.dnsAddress, POWER_MEMORY.subnetMask,
-                      POWER_MEMORY.gatewayAddress);
+  ETHERNET->configure(POWER_MEMORY.macAddress, POWER_MEMORY.isDHCP, POWER_MEMORY.ipAddress, POWER_MEMORY.dnsAddress,
+                      POWER_MEMORY.subnetMask, POWER_MEMORY.gatewayAddress);
   ETHERNET->setup();
   SERVER->configure(ETHERNET->getServer(HTTP_PORT));
   SERVER->setup();

@@ -58,7 +58,8 @@ void PowerSwitch::monitorSwitch() {
   for (int i = 1; i <= NUM_DEVICES; i++) {
     bool currentStatus = GPIO->getPin(GPIO_INPUT, i)->getCurrentStatus();
     if (currentStatus != POWER_DATA->getCurrentRelayStatus(i - 1)) {
-      if (firstPass == false) SCREEN->setScreen(LIGHT, String(POWER_DATA->getDeviceName(i - 1)) + String((currentStatus) ? " ON" : " OFF"));
+      if (firstPass == false)
+        SCREEN->setScreen(LIGHT, String(POWER_DATA->getDeviceName(i - 1)) + String((currentStatus) ? " ON" : " OFF"));
 
       POWER_DATA->setCurrentRelayStatus(i - 1, currentStatus);
       GPIO->getPin(GPIO_LED, i)->setCurrentStatus(currentStatus);
@@ -211,7 +212,8 @@ void onCommand(OutputInterface* terminal) {
     index = (unsigned long) atoi(value);
     gpio = GPIO->getPin(GPIO_PULSE, index);
     if (gpio != nullptr) {
-      if (GPIO->getPin(GPIO_INPUT, index)->getCurrentStatus() == false) GPIO->getPin(GPIO_PULSE, index)->setCurrentStatus(true);
+      if (GPIO->getPin(GPIO_INPUT, index)->getCurrentStatus() == false)
+        GPIO->getPin(GPIO_PULSE, index)->setCurrentStatus(true);
     } else {
       terminal->println(ERROR, "Cannot find Switch Index: " + String(index));
     }
@@ -230,7 +232,8 @@ void offCommand(OutputInterface* terminal) {
     index = (unsigned long) atoi(value);
     gpio = GPIO->getPin(GPIO_PULSE, index);
     if (gpio != nullptr) {
-      if (GPIO->getPin(GPIO_INPUT, index)->getCurrentStatus() == true) GPIO->getPin(GPIO_PULSE, index)->setCurrentStatus(true);
+      if (GPIO->getPin(GPIO_INPUT, index)->getCurrentStatus() == true)
+        GPIO->getPin(GPIO_PULSE, index)->setCurrentStatus(true);
     } else {
       terminal->println(ERROR, "Cannot find Switch Index: " + String(index));
     }

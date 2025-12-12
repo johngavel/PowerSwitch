@@ -13,7 +13,8 @@ void PowerDisplay::screen() {
   String buildString;
   refresh = 1000;
   displayLines[lineIndex++] = ProgramInfo::AppName;
-  buildString = "Ver. " + String(ProgramInfo::MajorVersion) + String(".") + String(ProgramInfo::MinorVersion) + String(".") + String(ProgramInfo::BuildVersion);
+  buildString = "Ver. " + String(ProgramInfo::MajorVersion) + String(".") + String(ProgramInfo::MinorVersion) +
+                String(".") + String(ProgramInfo::BuildVersion);
   displayLines[lineIndex++] = buildString;
 
   if (TEMPERATURE->validTemperature()) {
@@ -52,5 +53,6 @@ void PowerDisplay::screen() {
     buildString += SCREEN_TAB;
   }
   displayLines[lineIndex++] = buildString;
-  SCREEN->setScreen(displayLines[0], displayLines[1], displayLines[2], displayLines[3], displayLines[4], displayLines[5], displayLines[6], displayLines[7]);
+  SCREEN->setScreen(displayLines[0], displayLines[1], displayLines[2], displayLines[3], displayLines[4],
+                    displayLines[5], displayLines[6], displayLines[7]);
 }

@@ -67,8 +67,22 @@ public:
     }
     html->closeTag()->println();
     html->openTag("table", "class=\"center\"")->openTrTag()->println();
-    html->openTdTag()->openTag("a", "href=\"/configname\"")->print("Configure Devices")->closeTag()->closeTag()->closeTag()->println();
-    html->openTrTag()->openTdTag()->openTag("a", "href=\"/server\"")->print("Server Control")->closeTag()->closeTag()->closeTag()->closeTag()->println();
+    html->openTdTag()
+        ->openTag("a", "href=\"/configname\"")
+        ->print("Configure Devices")
+        ->closeTag()
+        ->closeTag()
+        ->closeTag()
+        ->println();
+    html->openTrTag()
+        ->openTdTag()
+        ->openTag("a", "href=\"/server\"")
+        ->print("Server Control")
+        ->closeTag()
+        ->closeTag()
+        ->closeTag()
+        ->closeTag()
+        ->println();
 
     sendPageEnd(html);
     return html;
@@ -84,7 +98,8 @@ class ButtonMinPage : public BasicPage {
 public:
   ButtonMinPage(int __device, bool __status) : device(__device), status(__status){};
   HTMLBuilder* getHtml(HTMLBuilder* html) {
-    if (GPIO->getPin(GPIO_INPUT, device)->getCurrentStatus() != status) GPIO->getPin(GPIO_PULSE, device)->setCurrentStatus(true);
+    if (GPIO->getPin(GPIO_INPUT, device)->getCurrentStatus() != status)
+      GPIO->getPin(GPIO_PULSE, device)->setCurrentStatus(true);
     html->println((status == true) ? "on" : "off");
     return html;
   };
@@ -106,7 +121,8 @@ class ButtonPage : public FrontPage {
 public:
   ButtonPage(int __device, bool __status) : device(__device), status(__status) { refresh = 1; };
   void conductAction() {
-    if (GPIO->getPin(GPIO_INPUT, device)->getCurrentStatus() != status) GPIO->getPin(GPIO_PULSE, device)->setCurrentStatus(true);
+    if (GPIO->getPin(GPIO_INPUT, device)->getCurrentStatus() != status)
+      GPIO->getPin(GPIO_PULSE, device)->setCurrentStatus(true);
   };
   int device;
   bool status;
@@ -117,9 +133,10 @@ public:
   ServerPage() { setPageName("server"); };
   HTMLBuilder* getHtml(HTMLBuilder* html) {
     sendPageBegin(html);
-    String versionString =
-        "Ver. " + String(ProgramInfo::MajorVersion) + String(".") + String(ProgramInfo::MinorVersion) + String(".") + String(ProgramInfo::BuildVersion);
-    String buildString = "Build Date: " + String(ProgramInfo::compileDate) + " Time: " + String(ProgramInfo::compileTime);
+    String versionString = "Ver. " + String(ProgramInfo::MajorVersion) + String(".") +
+                           String(ProgramInfo::MinorVersion) + String(".") + String(ProgramInfo::BuildVersion);
+    String buildString =
+        "Build Date: " + String(ProgramInfo::compileDate) + " Time: " + String(ProgramInfo::compileTime);
     String authorString = "Author: " + String(ProgramInfo::AuthorName);
 
     html->openTag("h2")->print(ProgramInfo::AppName)->closeTag()->println();
@@ -170,19 +187,63 @@ public:
     html->openTrTag()->tdTag("Pico")->tdTag(String((POWER_DATA->getOnline(HWC_COMPUTER)) ? "ON" : "OFF"))->closeTag();
     html->openTrTag()->tdTag("Display")->tdTag(String((POWER_DATA->getOnline(HWC_DISPLAY)) ? "ON" : "OFF"))->closeTag();
     html->openTrTag()->tdTag("GPIO Ex")->tdTag(String((POWER_DATA->getOnline(HWC_GPIO)) ? "ON" : "OFF"))->closeTag();
-    html->openTrTag()->tdTag("Temperature")->tdTag(String((POWER_DATA->getOnline(HWC_TEMPERATURE)) ? "ON" : "OFF"))->closeTag();
-    html->openTrTag()->tdTag("Ethernet")->tdTag(String((POWER_DATA->getOnline(HWC_ETHERNET)) ? "ON" : "OFF"))->closeTag();
+    html->openTrTag()
+        ->tdTag("Temperature")
+        ->tdTag(String((POWER_DATA->getOnline(HWC_TEMPERATURE)) ? "ON" : "OFF"))
+        ->closeTag();
+    html->openTrTag()
+        ->tdTag("Ethernet")
+        ->tdTag(String((POWER_DATA->getOnline(HWC_ETHERNET)) ? "ON" : "OFF"))
+        ->closeTag();
     html->openTrTag()->tdTag("EEPROM")->tdTag(String((POWER_DATA->getOnline(HWC_EEPROM)) ? "ON" : "OFF"))->closeTag();
     html->closeTag();
     html->brTag()->println();
 
     html->openTag("table", "class=\"center\"");
-    html->openTrTag()->openTdTag()->openTag("a", "href=\"/ipconfig\"")->print("Configure IP Addresses")->closeTag()->closeTag()->closeTag();
-    html->openTrTag()->openTdTag()->openTag("a", "href=\"/import\"")->print("Import Switch Configuration")->closeTag()->closeTag()->closeTag()->println();
-    html->openTrTag()->openTdTag()->openTag("a", "href=\"/export\"")->print("Export Switch Configuration")->closeTag()->closeTag()->closeTag()->println();
-    html->openTrTag()->openTdTag()->openTag("a", "href=\"/upgrade\"")->print("Upgrade the Power Switch")->closeTag()->closeTag()->closeTag();
-    html->openTrTag()->openTdTag()->openTag("a", "href=\"/code\"")->print("Source Code of the Pico Power Switch")->closeTag()->closeTag()->closeTag();
-    html->openTrTag()->openTdTag()->openTag("a", "href=\"/terminal\"")->print("Console Terminal for the Pico Power Switch")->closeTag()->closeTag()->closeTag();
+    html->openTrTag()
+        ->openTdTag()
+        ->openTag("a", "href=\"/ipconfig\"")
+        ->print("Configure IP Addresses")
+        ->closeTag()
+        ->closeTag()
+        ->closeTag();
+    html->openTrTag()
+        ->openTdTag()
+        ->openTag("a", "href=\"/import\"")
+        ->print("Import Switch Configuration")
+        ->closeTag()
+        ->closeTag()
+        ->closeTag()
+        ->println();
+    html->openTrTag()
+        ->openTdTag()
+        ->openTag("a", "href=\"/export\"")
+        ->print("Export Switch Configuration")
+        ->closeTag()
+        ->closeTag()
+        ->closeTag()
+        ->println();
+    html->openTrTag()
+        ->openTdTag()
+        ->openTag("a", "href=\"/upgrade\"")
+        ->print("Upgrade the Power Switch")
+        ->closeTag()
+        ->closeTag()
+        ->closeTag();
+    html->openTrTag()
+        ->openTdTag()
+        ->openTag("a", "href=\"/code\"")
+        ->print("Source Code of the Pico Power Switch")
+        ->closeTag()
+        ->closeTag()
+        ->closeTag();
+    html->openTrTag()
+        ->openTdTag()
+        ->openTag("a", "href=\"/terminal\"")
+        ->print("Console Terminal for the Pico Power Switch")
+        ->closeTag()
+        ->closeTag()
+        ->closeTag();
     html->closeTag();
     html->brTag()->println();
 
@@ -291,9 +352,11 @@ public:
     bool isDhcp = POWER_MEMORY.isDHCP;
     html->openTag("fieldset");
     html->openTag("legend")->print("Select IP Address Source")->closeTag()->println();
-    html->closeTag("input", "type=\"radio\" id=\"dhcp0\" name=\"dhcp\" value=\"0\"" + String((!isDhcp) ? " checked" : ""));
+    html->closeTag("input",
+                   "type=\"radio\" id=\"dhcp0\" name=\"dhcp\" value=\"0\"" + String((!isDhcp) ? " checked" : ""));
     html->openTag("label", "for=\"dhcp0\"")->print("Static IP")->closeTag();
-    html->closeTag("input", "type=\"radio\" id=\"dhcp1\" name=\"dhcp\" value=\"1\"" + String((isDhcp) ? " checked" : ""));
+    html->closeTag("input",
+                   "type=\"radio\" id=\"dhcp1\" name=\"dhcp\" value=\"1\"" + String((isDhcp) ? " checked" : ""));
     html->openTag("label", "for=\"dhcp1\"")->print("DHCP")->closeTag();
     html->closeTag();
 
@@ -302,19 +365,23 @@ public:
     byte* address = POWER_MEMORY.ipAddress;
     html->openTrTag()->tdTag("IPAddress");
     html->openTdTag()
-        ->closeTag("input", "type=\"text\" maxlength=\"3\" size=\"3\" pattern=\"[^\\s]+\" value=\"" + String(address[0]) + "\" name=\"ip0\"\"")
+        ->closeTag("input", "type=\"text\" maxlength=\"3\" size=\"3\" pattern=\"[^\\s]+\" value=\"" +
+                                String(address[0]) + "\" name=\"ip0\"\"")
         ->closeTag()
         ->println();
     html->openTdTag()
-        ->closeTag("input", "type=\"text\" maxlength=\"3\" size=\"3\" pattern=\"[^\\s]+\" value=\"" + String(address[1]) + "\" name=\"ip1\"\"")
+        ->closeTag("input", "type=\"text\" maxlength=\"3\" size=\"3\" pattern=\"[^\\s]+\" value=\"" +
+                                String(address[1]) + "\" name=\"ip1\"\"")
         ->closeTag()
         ->println();
     html->openTdTag()
-        ->closeTag("input", "type=\"text\" maxlength=\"3\" size=\"3\" pattern=\"[^\\s]+\" value=\"" + String(address[2]) + "\" name=\"ip2\"\"")
+        ->closeTag("input", "type=\"text\" maxlength=\"3\" size=\"3\" pattern=\"[^\\s]+\" value=\"" +
+                                String(address[2]) + "\" name=\"ip2\"\"")
         ->closeTag()
         ->println();
     html->openTdTag()
-        ->closeTag("input", "type=\"text\" maxlength=\"3\" size=\"3\" pattern=\"[^\\s]+\" value=\"" + String(address[3]) + "\" name=\"ip3\"\"")
+        ->closeTag("input", "type=\"text\" maxlength=\"3\" size=\"3\" pattern=\"[^\\s]+\" value=\"" +
+                                String(address[3]) + "\" name=\"ip3\"\"")
         ->closeTag()
         ->println();
     html->closeTag()->println();
@@ -322,19 +389,23 @@ public:
     address = POWER_MEMORY.subnetMask;
     html->openTrTag()->tdTag("Subnet Mask");
     html->openTdTag()
-        ->closeTag("input", "type=\"text\" maxlength=\"3\" size=\"3\" pattern=\"[^\\s]+\" value=\"" + String(address[0]) + "\" name=\"sm0\"\"")
+        ->closeTag("input", "type=\"text\" maxlength=\"3\" size=\"3\" pattern=\"[^\\s]+\" value=\"" +
+                                String(address[0]) + "\" name=\"sm0\"\"")
         ->closeTag()
         ->println();
     html->openTdTag()
-        ->closeTag("input", "type=\"text\" maxlength=\"3\" size=\"3\" pattern=\"[^\\s]+\" value=\"" + String(address[1]) + "\" name=\"sm1\"\"")
+        ->closeTag("input", "type=\"text\" maxlength=\"3\" size=\"3\" pattern=\"[^\\s]+\" value=\"" +
+                                String(address[1]) + "\" name=\"sm1\"\"")
         ->closeTag()
         ->println();
     html->openTdTag()
-        ->closeTag("input", "type=\"text\" maxlength=\"3\" size=\"3\" pattern=\"[^\\s]+\" value=\"" + String(address[2]) + "\" name=\"sm2\"\"")
+        ->closeTag("input", "type=\"text\" maxlength=\"3\" size=\"3\" pattern=\"[^\\s]+\" value=\"" +
+                                String(address[2]) + "\" name=\"sm2\"\"")
         ->closeTag()
         ->println();
     html->openTdTag()
-        ->closeTag("input", "type=\"text\" maxlength=\"3\" size=\"3\" pattern=\"[^\\s]+\" value=\"" + String(address[3]) + "\" name=\"sm3\"\"")
+        ->closeTag("input", "type=\"text\" maxlength=\"3\" size=\"3\" pattern=\"[^\\s]+\" value=\"" +
+                                String(address[3]) + "\" name=\"sm3\"\"")
         ->closeTag()
         ->println();
     html->closeTag()->println();
@@ -342,19 +413,23 @@ public:
     address = POWER_MEMORY.gatewayAddress;
     html->openTrTag()->tdTag("Gateway Address");
     html->openTdTag()
-        ->closeTag("input", "type=\"text\" maxlength=\"3\" size=\"3\" pattern=\"[^\\s]+\" value=\"" + String(address[0]) + "\" name=\"ga0\"\"")
+        ->closeTag("input", "type=\"text\" maxlength=\"3\" size=\"3\" pattern=\"[^\\s]+\" value=\"" +
+                                String(address[0]) + "\" name=\"ga0\"\"")
         ->closeTag()
         ->println();
     html->openTdTag()
-        ->closeTag("input", "type=\"text\" maxlength=\"3\" size=\"3\" pattern=\"[^\\s]+\" value=\"" + String(address[1]) + "\" name=\"ga1\"\"")
+        ->closeTag("input", "type=\"text\" maxlength=\"3\" size=\"3\" pattern=\"[^\\s]+\" value=\"" +
+                                String(address[1]) + "\" name=\"ga1\"\"")
         ->closeTag()
         ->println();
     html->openTdTag()
-        ->closeTag("input", "type=\"text\" maxlength=\"3\" size=\"3\" pattern=\"[^\\s]+\" value=\"" + String(address[2]) + "\" name=\"ga2\"\"")
+        ->closeTag("input", "type=\"text\" maxlength=\"3\" size=\"3\" pattern=\"[^\\s]+\" value=\"" +
+                                String(address[2]) + "\" name=\"ga2\"\"")
         ->closeTag()
         ->println();
     html->openTdTag()
-        ->closeTag("input", "type=\"text\" maxlength=\"3\" size=\"3\" pattern=\"[^\\s]+\" value=\"" + String(address[3]) + "\" name=\"ga3\"\"")
+        ->closeTag("input", "type=\"text\" maxlength=\"3\" size=\"3\" pattern=\"[^\\s]+\" value=\"" +
+                                String(address[3]) + "\" name=\"ga3\"\"")
         ->closeTag()
         ->println();
     html->closeTag()->println();
@@ -362,19 +437,23 @@ public:
     address = POWER_MEMORY.dnsAddress;
     html->openTrTag()->tdTag("DNS Address");
     html->openTdTag()
-        ->closeTag("input", "type=\"text\" maxlength=\"3\" size=\"3\" pattern=\"[^\\s]+\" value=\"" + String(address[0]) + "\" name=\"da0\"\"")
+        ->closeTag("input", "type=\"text\" maxlength=\"3\" size=\"3\" pattern=\"[^\\s]+\" value=\"" +
+                                String(address[0]) + "\" name=\"da0\"\"")
         ->closeTag()
         ->println();
     html->openTdTag()
-        ->closeTag("input", "type=\"text\" maxlength=\"3\" size=\"3\" pattern=\"[^\\s]+\" value=\"" + String(address[1]) + "\" name=\"da1\"\"")
+        ->closeTag("input", "type=\"text\" maxlength=\"3\" size=\"3\" pattern=\"[^\\s]+\" value=\"" +
+                                String(address[1]) + "\" name=\"da1\"\"")
         ->closeTag()
         ->println();
     html->openTdTag()
-        ->closeTag("input", "type=\"text\" maxlength=\"3\" size=\"3\" pattern=\"[^\\s]+\" value=\"" + String(address[2]) + "\" name=\"da2\"\"")
+        ->closeTag("input", "type=\"text\" maxlength=\"3\" size=\"3\" pattern=\"[^\\s]+\" value=\"" +
+                                String(address[2]) + "\" name=\"da2\"\"")
         ->closeTag()
         ->println();
     html->openTdTag()
-        ->closeTag("input", "type=\"text\" maxlength=\"3\" size=\"3\" pattern=\"[^\\s]+\" value=\"" + String(address[3]) + "\" name=\"da3\"\"")
+        ->closeTag("input", "type=\"text\" maxlength=\"3\" size=\"3\" pattern=\"[^\\s]+\" value=\"" +
+                                String(address[3]) + "\" name=\"da3\"\"")
         ->closeTag()
         ->println();
     html->closeTag()->println();

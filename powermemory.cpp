@@ -280,7 +280,9 @@ void PowerMemory::exportMem() {
   exportMem.exportData("gatewayAddress", POWER_MEMORY.gatewayAddress, 4);
   exportMem.exportData("numberOfDevices", POWER_MEMORY.numberOfDevices);
   exportMem.exportData("drift", POWER_MEMORY.drift);
-  for (int i = 0; i < NUM_DEVICES; i++) { exportMem.exportData("deviceName" + String(i), String(POWER_MEMORY.deviceName[i])); }
+  for (int i = 0; i < NUM_DEVICES; i++) {
+    exportMem.exportData("deviceName" + String(i), String(POWER_MEMORY.deviceName[i]));
+  }
   exportMem.close();
 }
 
