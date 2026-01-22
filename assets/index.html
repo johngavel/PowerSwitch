@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Import the JS modules -->
+  <script type="module" src="/js/main.js"></script>
+  <script type="module" src="/js/power.js"></script>
+  <link rel="stylesheet" href="/style/style.css">
+</head>
+<body>
+  <!-- Use the custom elements -->
+  <my-header></my-header>
+
+  <main class="container">
+    <!-- Your main page content goes here -->
+    <config-card title="">
+      <element-group>
+        <div id="devices"></div>
+        <form id="nameForm" novalidate>
+        <button type="submit" hidden aria-hidden="true"></button>
+        <table><tbody>
+          <tr>
+            <td><div class="label">Power 1.</div></td>
+            <td><input id="devicename0" class="device-input" type="text" maxlength="15" pattern="[^\s]+" value="Device"/></td>
+            <td><button id="button0" type="button" class="button buttonWarn"></button></td>
+          </tr>
+          <tr>
+            <td><div class="label">Power 2.</div></td>
+            <td><input id="devicename1" class="device-input" type="text" maxlength="15" pattern="[^\s]+" value="Device"/></td>
+            <td><button id="button1" type="button" class="button buttonWarn"></button></td>
+          </tr>
+          <tr>
+            <td><div class="label">Power 3.</div></td>
+            <td><input id="devicename2" class="device-input" type="text" maxlength="15" pattern="[^\s]+" value="Device"/></td>
+            <td><button id="button2" type="button" class="button buttonWarn"></button></td>
+          </tr>
+          <tr>
+            <td><div class="label">Power 4.</div></td>
+            <td><input id="devicename3" class="device-input" type="text" maxlength="15" pattern="[^\s]+" value="Device"/></td>
+            <td><button id="button3" type="button" class="button buttonWarn"></button></td>
+          </tr>
+          <tr>
+            <td><div class="label">Power 5.</div></td>
+            <td><input id="devicename4" class="device-input" type="text" maxlength="15" pattern="[^\s]+" value="Device"/></td>
+            <td><button id="button4" type="button" class="button buttonWarn"></button></td>
+          </tr>
+        </tbody></table>
+        </form>
+        <span>(No whitespace, max length is 15 characters)</span>
+      </element-group>
+      <element-group>
+        <button type="submit" form="nameForm" class="button buttonWarn">Save Settings</button>
+        <nav-button link="/server.html" color="forward">Configuration</nav-button>
+      </element-group>
+    </config-card>
+  </main>
+  
+  <my-footer></my-footer>
+</body>
+</html>
