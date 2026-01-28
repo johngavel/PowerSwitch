@@ -96,6 +96,7 @@ void setupPowerSwitch() {
 
   screen.setRefreshScreen(new WiredScreen(&ethernetModule), 500);
   taskManager.add(&screen);
+  hardwareList.add(&screen);
 }
 
 // ---------- Setup / Loop ----------
@@ -111,6 +112,7 @@ void setup() {
 
   ethernetModule.configure();
   ethernetModule.allowDHCP(true);
+  license.addLibrary(ETHERNET_INDEX);
 
   memory.configure(I2C_DEVICESIZE_24LC16);
   pico.rebootCallBacks.addCallback([&]() { (void) memory.forceWrite(); });
@@ -123,7 +125,7 @@ void setup() {
   sb + ":\\> ";
   telnet.configure(ethernetModule.getServer(TELNET_PORT), sb.c_str(), banner);
 
-  loadServerStandard(static_cast<EthernetMemory*>(ethernetModule.getMemory()), &server, &fileSystem, &taskManager,
+  loadServerStandard(static_cast<JsonInterface*>(ethernetModule.getMemory()), &server, &fileSystem, &taskManager,
                      &memory);
   ArrayDirectory* dir = static_cast<ArrayDirectory*>(fileSystem.open("/www"));
   dir->addFile(new StaticFile("favicon.ico", faviconblueico, faviconblueico_len));
