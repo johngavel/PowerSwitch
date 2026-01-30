@@ -1,6 +1,6 @@
 #include "powerswitch.h"
 
-#include <GavelPicoStandard.h>
+#include <GavelPico.h>
 #include <GavelScreen.h>
 
 extern Screen screen;
