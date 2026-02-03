@@ -95,6 +95,9 @@ void setupPowerSwitch() {
   license.addLibrary(ADAFRUIT_UNIFIED_SENSOR_INDEX);
 
   screen.setRefreshScreen(new WiredScreen(&ethernetModule), 500);
+  screen.setSplashScreen(JAXSON, String(ProgramInfo::AppName) + " v" + String(ProgramInfo::MajorVersion) + String(".") +
+                                     String(ProgramInfo::MinorVersion));
+
   taskManager.add(&screen);
   hardwareList.add(&screen);
 }
