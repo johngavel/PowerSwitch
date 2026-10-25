@@ -73,9 +73,11 @@ void PowerSwitch::monitorDevice() {
   for (unsigned int i = 0; i < hardwareList.size(); i++) {
     bool status = hardwareList[i]->isWorking();
     overallStatus &= status;
-    gpioManager.find(GpioType::Led, i + 6)->set(status);
+    auto* statusLed = gpioManager.find(GpioType::Led, i + 6);
+    if (statusLed) { statusLed->set(status); }
   }
-  gpioManager.find(GpioType::Led, 0)->set(overallStatus);
+  auto* overallLed = gpioManager.find(GpioType::Led, 0);
+  if (overallLed) { overallLed->set(overallStatus); }
 };
 
 void PowerSwitch::commandSwitch() {
