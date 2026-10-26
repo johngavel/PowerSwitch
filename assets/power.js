@@ -47,6 +47,7 @@
       });
 
       let inFlight = false;
+      let intervalId = null;
 
       const poll = () => {
         if (inFlight) return;
@@ -63,8 +64,20 @@
           .finally(() => (inFlight = false));
       };
 
-      const intervalId = setInterval(poll, 1000);
-      window.addEventListener('beforeunload', () => clearInterval(intervalId));
+      const startPolling = () => {
+        if (intervalId !== null) clearInterval(intervalId);
+        poll();
+        intervalId = setInterval(poll, 1000);
+      };
+
+      // Restart when the page is restored from the back-forward cache.
+      // Do not clear the interval on beforeunload: doing so leaves a restored
+      // page alive but permanently stops its status updates.
+      window.addEventListener('pageshow', event => {
+        if (event.persisted) startPolling();
+      });
+
+      startPolling();
     });
 })();
 
