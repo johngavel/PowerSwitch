@@ -7,7 +7,7 @@
 
 class PowerStatus : public IMemory {
 public:
-  PowerStatus() : IMemory("Power Status"){};
+  PowerStatus() : IMemory("Power Status") {};
 
   // Virtual IMemory Methods
   typedef struct {

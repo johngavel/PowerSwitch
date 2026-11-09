@@ -10,7 +10,7 @@
 
 class PowerSwitch : public Task {
 public:
-  PowerSwitch() : Task("PowerSwitch"){};
+  PowerSwitch() : Task("PowerSwitch") {};
 
   // Virtual Task Methods
   virtual void addCmd(TerminalCommand* __termCmd) override;

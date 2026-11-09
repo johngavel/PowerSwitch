@@ -37,7 +37,7 @@ PowerSwitch powerswitch;
 #define SCREEN_TAB "   "
 class WiredScreen : public RefreshScreen {
 public:
-  WiredScreen(VirtualNetwork* __network) : network(__network){};
+  WiredScreen(VirtualNetwork* __network) : network(__network) {};
   virtual void screen() {
     String ipString = "0.0.0.0";
     String appString = String("Ver. ") + String(ProgramInfo::MajorVersion) + String(".") +

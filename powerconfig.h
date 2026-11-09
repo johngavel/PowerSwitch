@@ -7,7 +7,7 @@
 
 class PowerConfig : public IMemory {
 public:
-  PowerConfig() : IMemory("Power Config"){};
+  PowerConfig() : IMemory("Power Config") {};
 
   // Virtual IMemory Methods
   typedef struct {
